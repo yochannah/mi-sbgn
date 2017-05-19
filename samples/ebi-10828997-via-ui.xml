@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<sbgn xmlns="http://sbgn.org/libsbgn/0.2">
+    <map language="entity relationship">
+        <glyph id="glyph1" class="entity">
+            <label text="gli13_human"/>
+            <bbox y="10.0" x="11.0" h="60.0" w="108.0"/>
+            <glyph id="glyph1a" class="unit of information">
+                <label text="mt:prot"/>
+                <bbox y="62.0" x="41.0" h="16.0" w="48.0"/>
+            </glyph>
+        </glyph>
+        <glyph id="glyph2" class="entity">
+            <label text="sufu_human"/>
+            <bbox y="90.0" x="191.0" h="60.0" w="108.0"/>
+            <glyph id="glyph2a" class="unit of information">
+                <label text="mt:prot"/>
+                <bbox y="142.0" x="221.0" h="16.0" w="48.0"/>
+            </glyph>
+        </glyph>
+        <arc target="glyph2" source="glyph1" id="arc1" class="interaction">
+            <start y="64.0" x="119.0"/>
+            <end y="96.0" x="191.0"/>
+        </arc>
+    </map>
+</sbgn>

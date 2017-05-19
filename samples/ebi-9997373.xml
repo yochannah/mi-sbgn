@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<sbgn xmlns="http://sbgn.org/libsbgn/0.2">
+    <map language="entity relationship">
+        <glyph id="glyph3" class="entity">
+            <label text="est3_yeast"/>
+            <bbox y="110.0" x="11.0" h="60.0" w="108.0"/>
+            <glyph id="glyph3a" class="unit of information">
+                <label text="mt:prot"/>
+                <bbox y="161.0" x="38.5" h="18.0" w="53.0"/>
+            </glyph>
+        </glyph>
+        <glyph id="glyph4" class="entity">
+            <label text="est1_yeast"/>
+            <bbox y="10.0" x="171.0" h="60.0" w="108.0"/>
+            <glyph id="glyph4a" class="unit of information">
+                <label text="mt:prot"/>
+                <bbox y="61.0" x="198.5" h="18.0" w="53.0"/>
+            </glyph>
+        </glyph>
+        <glyph id="glyph1" class="entity">
+            <label text="tlc1_yeast_rna"/>
+            <bbox y="135.0" x="306.0" h="60.0" w="108.0"/>
+            <glyph id="glyph1a" class="unit of information">
+                <label text="mt:rna"/>
+                <bbox y="186.0" x="335.0" h="18.0" w="50.0"/>
+            </glyph>
+        </glyph>
+        <glyph id="glyph2" class="entity">
+            <label text="tert_yeast"/>
+            <bbox y="255.0" x="146.0" h="60.0" w="108.0"/>
+            <glyph id="glyph2a" class="unit of information">
+                <label text="mt:prot"/>
+                <bbox y="306.0" x="173.5" h="18.0" w="53.0"/>
+            </glyph>
+        </glyph>
+        <arc target="glyph3" source="glyph4" id="arc1" class="interaction">
+            <start y="70.0" x="177.0"/>
+            <end y="110.0" x="113.0"/>
+        </arc>
+        <arc target="glyph2" source="glyph3" id="arc2" class="interaction">
+            <start y="170.0" x="92.93104"/>
+            <end y="255.0" x="172.06897"/>
+        </arc>
+        <arc target="glyph4" source="glyph1" id="arc3" class="interaction">
+            <start y="135.0" x="327.6"/>
+            <end y="70.0" x="257.4"/>
+        </arc>
+        <arc target="glyph2" source="glyph1" id="arc4" class="interaction">
+            <start y="195.0" x="320.0"/>
+            <end y="255.0" x="240.0"/>
+        </arc>
+    </map>
+</sbgn>
