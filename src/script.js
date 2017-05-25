@@ -1,11 +1,19 @@
 var styles = {
   textSize: "5", //I know, it's numbers in strings. Don't cry.
   corners: "5",
-  leftOffset : "2"
+  leftOffset : "2",
+  padding : 2
 }, uoiTypes = {
   protein : "mt:prot",
   binding : "ct:bind"
 };
+
+//This is syntactic sugar.
+var setAttr = function(elem, x, y) {
+  elem.setAttributeNS(null, x, y);
+}, createElem = function(elemName) {
+  return document.createElementNS("http://www.w3.org/2000/svg",elemName);
+}
 
 
 var interaction;
@@ -19,87 +27,87 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
           function UnitOfInformation(info){
             this.info = uoiTypes[info];
-            this.node = document.createElementNS("http://www.w3.org/2000/svg","g");
-            this.node.setAttributeNS(null,"transform","translate(0,3)")
-            var text = document.createElementNS("http://www.w3.org/2000/svg","text")
+            this.node = createElem("g");
+            setAttr(this.node,"transform","translate(0,3)")
+            var text = createElem("text")
             text.appendChild(document.createTextNode(this.info));
-            var rect = document.createElementNS("http://www.w3.org/2000/svg","rect");
+            var rect = createElem("rect");
 
-            rect.setAttributeNS(null,"strokeWidth",1);
-            rect.setAttributeNS(null,"width",30);
-            rect.setAttributeNS(null,"height",10);
+            setAttr(rect,"strokeWidth",30);
+            setAttr(rect,"width",30);
+            setAttr(rect,"height",10);
             this.node.appendChild(rect);
 
 
-            text.setAttributeNS(null,"x",styles.leftOffset);
-            text.setAttributeNS(null,"y","6");
-            text.setAttributeNS(null,"font-size",  styles.textSize);
+            setAttr(text,"x",styles.leftOffset);
+            setAttr(text,"y","6");
+            setAttr(text,"font-size",  styles.textSize);
             this.node.appendChild(text);
 // TODO: Calc after render. Here it returns 0.
 //              this.textSize = text.getBBox();
-// rect.setAttributeNS(null,"width",this.textSize.width);
-// rect.setAttributeNS(null,"height",this.textSize.height);
+// setAttr(rect,"width",this.textSize.width);
+// setAttr(rect,"height",this.textSize.height);
           }
 
           function StateVariable(info){
             this.info = info;
-            this.node = document.createElementNS("http://www.w3.org/2000/svg","g");
-            this.node.setAttributeNS(null,"transform","translate(0,-15)")
-            var text = document.createElementNS("http://www.w3.org/2000/svg","text")
+            this.node = createElem("g");
+            setAttr(this.node,"transform","translate(0,-15)")
+            var text = createElem("text")
             text.appendChild(document.createTextNode(this.info));
-            var rect = document.createElementNS("http://www.w3.org/2000/svg","rect");
+            var rect = createElem("rect");
 
-            rect.setAttributeNS(null,"strokeWidth",1);
-            rect.setAttributeNS(null,"width",30);
-            rect.setAttributeNS(null,"rx",5);
-            rect.setAttributeNS(null,"ry",5);
-            rect.setAttributeNS(null,"height",10);
+            setAttr(rect,"strokeWidth",1);
+            setAttr(rect,"width",30);
+            setAttr(rect,"rx",5);
+            setAttr(rect,"ry",5);
+            setAttr(rect,"height",10);
             this.node.appendChild(rect);
 
 
-            text.setAttributeNS(null,"x",styles.leftOffset*2);
-            text.setAttributeNS(null,"y","6");
-            text.setAttributeNS(null,"font-size", styles.textSize);
+            setAttr(text,"x",styles.leftOffset*2);
+            setAttr(text,"y","6");
+            setAttr(text,"font-size", styles.textSize);
             this.node.appendChild(text);
 // TODO: Calc after render. Here it returns 0.
 //              this.textSize = text.getBBox();
-// rect.setAttributeNS(null,"width",this.textSize.width);
-// rect.setAttributeNS(null,"height",this.textSize.height);
+// setAttr(rect,"width",this.textSize.width);
+// setAttr(rect,"height",this.textSize.height);
           }
 
           function BindingSite(model, count){
             this.model = model;
             this.count = count + 1;
-            this.node = document.createElementNS("http://www.w3.org/2000/svg","g");
+            this.node = createElem("g");
             var loc = -45;
             if (count > 0) {
               loc = 45;
             }
-            this.node.setAttributeNS(null,"transform","translate(" + loc +",10)");
-            var text = document.createElementNS("http://www.w3.org/2000/svg","text")
+            setAttr(this.node,"transform","translate(" + loc +",10)");
+            var text = createElem("text")
             text.appendChild(document.createTextNode("binding region"));
-            var rect = document.createElementNS("http://www.w3.org/2000/svg","rect");
+            var rect = createElem("rect");
 
-            rect.setAttributeNS(null,"strokeWidth",1);
-            rect.setAttributeNS(null,"width",45);
-            rect.setAttributeNS(null,"x",(styles.leftOffset * -3));
-            rect.setAttributeNS(null,"y",-10);
+            setAttr(rect,"strokeWidth",1);
+            setAttr(rect,"width",45);
+            setAttr(rect,"x",(styles.leftOffset * -3));
+            setAttr(rect,"y",-10);
 
-            rect.setAttributeNS(null,"height",16);
+            setAttr(rect,"height",16);
             this.node.appendChild(rect);
 
 
 
-            text.setAttributeNS(null,"x",(styles.leftOffset * -2));
-            text.setAttributeNS(null,"y","0");
-            text.setAttributeNS(null,"font-size", styles.textSize);
+            setAttr(text,"x",(styles.leftOffset * -2));
+            setAttr(text,"y","0");
+            setAttr(text,"font-size", styles.textSize);
             this.node.appendChild(text);
             this.node.appendChild(new UnitOfInformation("binding").node);
             this.node.appendChild(new StateVariable(model.get("pos")).node);
 // TODO: Calc after render. Here it returns 0.
 //              this.textSize = text.getBBox();
-// rect.setAttributeNS(null,"width",this.textSize.width);
-// rect.setAttributeNS(null,"height",this.textSize.height);
+// setAttr(rect,"width",this.textSize.width);
+// setAttr(rect,"height",this.textSize.height);
           }
 
 
@@ -116,22 +124,25 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             Participant.prototype.init = function(model) {
               this.model = model;
-              this.node = document.createElementNS("http://www.w3.org/2000/svg","g");
+              this.node = createElem("g");
               this.interactor = this.model.get("interactor");
               this.initFeatures();
               this.initBindingSites();
               location = location + 30;
-              this.node.setAttributeNS(null,"x",10);
-              this.node.setAttributeNS(null,"y",location);
+              setAttr(this.node,"x",10);
+              setAttr(this.node,"y",location);
+
+              this.node.rect = createElem("rect");
+              this.node.append(this.node.rect);
 
 
-              var text = document.createElementNS("http://www.w3.org/2000/svg","text");
+              var text = createElem("text");
               var label = document.createTextNode(this.interactor.get("label"));
               text.appendChild(label);
-              text.setAttributeNS(null,"font-size", styles.textSize);
+              setAttr(text,"font-size", styles.textSize);
 
               this.node.appendChild(text);
-              this.node.setAttributeNS(null,"transform","translate(10," + location + ")");
+              setAttr(this.node,"transform","translate(10," + location + ")");
 
               this.node.uoi = new UnitOfInformation(this.interactor.get("type").name);
               this.node.appendChild(this.node.uoi.node);
@@ -146,6 +157,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
               }
             }
 
+            Participant.prototype.updateOutlines = function(){
+              console.log("updateme",this.node.getBBox(),this.node.rect);
+              var bb = this.node.getBBox();
+              setAttr(this.node.rect, "x", (bb.x - styles.padding));
+              setAttr(this.node.rect, "y", (bb.y - styles.padding));
+              setAttr(this.node.rect, "width", (bb.width + (styles.padding *2)));
+              setAttr(this.node.rect, "height", (bb.height+ (styles.padding*2)));
+            }
 
             Participant.prototype.initFeatures = function(){
               this.features = this.model.get("features");
@@ -170,13 +189,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
             var ComplexView = Backbone.View.extend({
                 className: "sbgnContainer",
                 interactors : model.attributes.interactors.models,
+                participants : [],
                 initialize: function() {
                     this.render();
                     this.listenTo(this.model, "change", this.render);
                 },
                 render: function() {
                     var parent = this;
-                    var mynode = document.createElementNS("http://www.w3.org/2000/svg","rect");
+                    var mynode = createElem("rect");
                     mynode.setAttributeNS(null,"x",10);
                     mynode.setAttributeNS(null,"y",10);
                     mynode.setAttributeNS(null,"height",300);
@@ -186,7 +206,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     model.get("interactions").at(0).get("participants").map(function(participant){
                       var newParticipant = new Participant(participant);
                       parent.el.appendChild(newParticipant.node);
+                      parent.participants.push(newParticipant);
                     });
+
+                    console.log("%cparent.el","border-bottom:chartreuse solid 3px;",parent.participants);
+                    parent.participants.map(function(participant) {
+                      participant.updateOutlines();
+                    });
+
                   } catch (e) {console.log("%ce","color:navajowhite;font-weight:bold;",e);}
                     return this;
                 }
