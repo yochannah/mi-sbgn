@@ -94,6 +94,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
             setAttr(rect,"width",45);
             setAttr(rect,"x",(styles.leftOffset * -3));
             setAttr(rect,"y",-10);
+            setAttr(rect,"rx",1);
+            setAttr(rect,"ry",1);
+
 
             setAttr(rect,"height",16);
             this.node.appendChild(rect);
@@ -141,6 +144,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
               this.node.rect = createElem("rect");
               this.node.append(this.node.rect);
+
+              setAttr(this.node.rect,"rx",1);
+              setAttr(this.node.rect,"ry",1);
 
 
               var text = createElem("text");
