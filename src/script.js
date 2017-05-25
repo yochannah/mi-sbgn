@@ -1,7 +1,7 @@
 var styles = {
-  textSize: "5", //I know, it's numbers in strings. Don't cry.
-  corners: "5",
-  leftOffset : "2",
+  textSize: 5,
+  corners: 5,
+  leftOffset : 2,
   padding : 2
 }, uoiTypes = {
   protein : "mt:prot",
@@ -33,7 +33,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             text.appendChild(document.createTextNode(this.info));
             var rect = createElem("rect");
 
-            setAttr(rect,"strokeWidth",30);
             setAttr(rect,"width",30);
             setAttr(rect,"height",10);
             this.node.appendChild(rect);
@@ -43,10 +42,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
             setAttr(text,"y","6");
             setAttr(text,"font-size",  styles.textSize);
             this.node.appendChild(text);
-// TODO: Calc after render. Here it returns 0.
-//              this.textSize = text.getBBox();
-// setAttr(rect,"width",this.textSize.width);
-// setAttr(rect,"height",this.textSize.height);
+          }
+          UnitOfInformation.prototype.updateOutlines = function(parentBB){
+            console.log("%cparentBB.height","color:darkseagreen;font-weight:bold;", parentBB.height);
+            var top = parentBB.height - 8;
+//            var top = 20;
+            setAttr(this.node, "transform", "translate(0," + top + ")");
           }
 
           function StateVariable(info){
@@ -79,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             this.model = model;
             this.count = count + 1;
             this.node = createElem("g");
+
             var loc = -45;
             if (count > 0) {
               loc = 45;
@@ -86,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             setAttr(this.node,"transform","translate(" + loc +",10)");
             var text = createElem("text")
             text.appendChild(document.createTextNode("binding region"));
-            var rect = createElem("rect");
+            var rect = this.rect = createElem("rect");
 
             setAttr(rect,"strokeWidth",1);
             setAttr(rect,"width",45);
@@ -104,10 +106,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
             this.node.appendChild(text);
             this.node.appendChild(new UnitOfInformation("binding").node);
             this.node.appendChild(new StateVariable(model.get("pos")).node);
-// TODO: Calc after render. Here it returns 0.
-//              this.textSize = text.getBBox();
-// setAttr(rect,"width",this.textSize.width);
-// setAttr(rect,"height",this.textSize.height);
+          return this;
+          }
+
+          BindingSite.prototype.updateOutlines = function(){
+            bb = this.node.getBBox();
+            setAttr(this.rect, "x", (bb.x - styles.padding));
+            setAttr(this.rect, "width", (bb.width + (styles.padding *2)));
+            console.log("%cthis.node","color:turquoise;font-weight:bold;",this.node);
+            //height is pretty simple so we don't update it.
           }
 
 
@@ -128,7 +135,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
               this.interactor = this.model.get("interactor");
               this.initFeatures();
               this.initBindingSites();
-              location = location + 30;
+              location = location + 35;
               setAttr(this.node,"x",10);
               setAttr(this.node,"y",location);
 
@@ -149,21 +156,34 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
               if(this.bindingSites){
                 var parent = this;
+                parent.node.bindingSites = [];
                 this.bindingSites.map(function(site, i){
-                  console.log("%csite","color:turquoise;font-weight:bold;",site, i);
-                  parent.node.bindingSite = new BindingSite(site, i)
-                  parent.node.appendChild(parent.node.bindingSite.node);
+                  var newSite = new BindingSite(site, i);
+                  parent.node.bindingSites.push(newSite);
+                  parent.node.appendChild(newSite.node);
                 });
               }
             }
 
             Participant.prototype.updateOutlines = function(){
-              console.log("updateme",this.node.getBBox(),this.node.rect);
+              console.log("updateme",this.node.getBBox(),this.node.uoi);
+
               var bb = this.node.getBBox();
+
+              //update binding sites and uois
+              this.node.bindingSites.map(function(site){
+                site.updateOutlines();
+              });
+
+              bb = this.node.getBBox();
+
               setAttr(this.node.rect, "x", (bb.x - styles.padding));
               setAttr(this.node.rect, "y", (bb.y - styles.padding));
               setAttr(this.node.rect, "width", (bb.width + (styles.padding *2)));
               setAttr(this.node.rect, "height", (bb.height+ (styles.padding*2)));
+
+              this.node.uoi.updateOutlines(bb);
+
             }
 
             Participant.prototype.initFeatures = function(){
@@ -209,7 +229,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                       parent.participants.push(newParticipant);
                     });
 
-                    console.log("%cparent.el","border-bottom:chartreuse solid 3px;",parent.participants);
                     parent.participants.map(function(participant) {
                       participant.updateOutlines();
                     });
