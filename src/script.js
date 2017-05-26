@@ -2,8 +2,8 @@ var styles = {
         textSize: 5,
         corners: 5,
         leftOffset: 2,
-        padding: 2
-    },
+        padding: 2,
+        infoWidth : 30 },
     uoiTypes = {
         protein: "mt:prot",
         binding: "ct:bind"
@@ -35,44 +35,40 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 text.appendChild(document.createTextNode(this.info));
                 var rect = createElem("rect");
 
-                setAttr(rect, "width", 30);
-                setAttr(rect, "height", 10);
+                setAttr(rect, "width", styles.infoWidth);
+                setAttr(rect, "height", styles.textSize+2);
                 this.node.appendChild(rect);
 
 
                 setAttr(text, "x", styles.leftOffset);
-                setAttr(text, "y", "6");
+                setAttr(text, "y", styles.textSize);
                 setAttr(text, "font-size", styles.textSize);
                 this.node.appendChild(text);
             }
             UnitOfInformation.prototype.updateOutlines = function(parentBB) {
-                var top = parentBB.height - 8;
+                var top = parentBB.height - styles.textSize - styles.padding;
                 setAttr(this.node, "transform", "translate(0," + top + ")");
             }
 
             function StateVariable(info) {
                 this.info = info;
                 this.node = createElem("g");
-                setAttr(this.node, "transform", "translate(0,-15)")
+                setAttr(this.node, "transform", "translate(0," + (-2 * (styles.textSize + styles.padding)) + ")")
                 var text = createElem("text")
                 text.appendChild(document.createTextNode(this.info));
                 var rect = createElem("rect");
 
-                setAttr(rect, "width", 30);
+                setAttr(rect, "width", styles.infoWidth);
                 setAttr(rect, "rx", 5);
                 setAttr(rect, "ry", 5);
-                setAttr(rect, "height", styles.textSize * 2);
+                setAttr(rect, "height", styles.textSize + 2);
                 this.node.appendChild(rect);
 
 
                 setAttr(text, "x", styles.leftOffset * 2);
-                setAttr(text, "y", "6");
+                setAttr(text, "y", "5");
                 setAttr(text, "font-size", styles.textSize);
                 this.node.appendChild(text);
-                // TODO: Calc after render. Here it returns 0.
-                //              this.textSize = text.getBBox();
-                // setAttr(rect,"width",this.textSize.width);
-                // setAttr(rect,"height",this.textSize.height);
             }
 
             function BindingSite(model, count) {
@@ -89,21 +85,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 text.appendChild(document.createTextNode("binding region"));
                 var rect = this.rect = createElem("rect");
 
-                setAttr(rect, "strokeWidth", 1);
-                setAttr(rect, "width", 45);
+                setAttr(rect, "width", 1.5*styles.infoWidth);
                 setAttr(rect, "x", (styles.leftOffset * -3));
-                setAttr(rect, "y", -10);
+                setAttr(rect, "y", -2 * styles.textSize);
                 setAttr(rect, "rx", 1);
                 setAttr(rect, "ry", 1);
-
-
-                setAttr(rect, "height", 16);
+                setAttr(rect, "height", styles.textSize * 3);
                 this.node.appendChild(rect);
 
-
-
                 setAttr(text, "x", (styles.leftOffset * -2));
-                setAttr(text, "y", "0");
+                setAttr(text, "y", "-1");
                 setAttr(text, "font-size", styles.textSize);
                 this.node.appendChild(text);
                 this.node.appendChild(new UnitOfInformation("binding").node);
@@ -141,8 +132,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 this.interactor = this.model.get("interactor");
                 this.initFeatures();
                 this.initBindingSites();
-                location = location + 35;
-                this.setLocation(10, location);
 
                 this.node.rect = createElem("rect");
                 this.node.append(this.node.rect);
@@ -173,16 +162,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
             }
 
             Participant.prototype.updateOutlines = function() {
-                console.log("updateme", this.node.getBBox(), this.node.uoi);
-
-                var bb = this.node.getBBox();
 
                 //update binding sites and uois
                 this.node.bindingSites.map(function(site) {
                     site.updateOutlines();
                 });
 
-                bb = this.node.getBBox();
+                var bb = this.node.getBBox();
 
                 setAttr(this.node.rect, "x", (bb.x - styles.padding));
                 setAttr(this.node.rect, "y", (bb.y - styles.padding));
@@ -195,8 +181,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             Participant.prototype.initFeatures = function() {
                 this.features = this.model.get("features");
-                var parentId = this.model.get("id");
-                console.log("%cthis","color:turquoise;font-weight:bold;",this);
                 if (this.features.length > 0) {
                     this.features = this.features.models;
                 } else {
@@ -209,7 +193,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     var id1 = parseInt(feature.get("linkedFeatures").models[0].get("id"),10);
                     var id2 = parseInt(feature.get("id"),10);
                     links = links.concat(feature.get("linkedFeatures").models);
-                    console.log("%clinks","color:turquoise;font-weight:bold;",links,parentId, id1, id2, feature.get("linkedFeatures").models);
                   });
                 }
             }
@@ -238,9 +221,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 render: function() {
                     var parent = this;
                     var mynode = createElem("rect");
-                    mynode.setAttributeNS(null, "x", 10);
-                    mynode.setAttributeNS(null, "y", 10);
-                    mynode.setAttributeNS(null, "height", 300);
+                    setAttr(mynode, "x", 10);
+                    setAttr(mynode, "y", 10);
+                    setAttr(mynode, "height", 300);
                     this.el.appendChild(mynode);
 
                     try {
@@ -255,44 +238,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         parent.participants.map(function(participant) {
                             participant.updateOutlines();
                         });
-                //      console.log("%cparent.participants","color:turquoise;font-weight:bold;",parent.participants);
 
                         var nodeLocations = [], links = [], nodeIndexLookup = {};
-
                         parent.participants.map(function(participant) {
                             var bb = participant.node.getBBox(),
                               id = participant.model.get("id");
 
+                              //TODO THIS IS HARDWIRED. Needs to dynamically output all links.
 
-                            console.log("%cparticipantnode","color:goldenrod;font-weight:bold;",participant.bindingSites, 5);
-
-                            participant.bindingSites.map(function(site){
-                              var nodeId = nodeLocations.length;
-                              console.log("%csite","color:turquoise;font-weight:bold;",site);
-                            });
-
+                              //suggest keep a node index lookup table.
                             nodeLocations.push({width : bb.width,height : bb.height, participant : participant})
                             links.push({source: 0,target: 1});
-//                            console.log("%clinks","color:turquoise;font-weight:bold;",links);
                           });
 
-                          // var actualLinks = []
-                          //
-                          // _.each(links, function(id, intid){
-                          //   _.each(links, function(id2, intid2){
-                          //     if(intid != intid2) {
-                          //     actualLinks.push({source: parseInt(intid,10), target:parseInt(intid2,10)})
-                          //     }
-                          //   });
-                          // });
-
-//                          console.log("%cactualLinks","color:turquoise;font-weight:bold;",actualLinks);
-
-console.log("%cnodeLocations","color:turquoise;font-weight:bold;",nodeLocations);
                         //now we need to lay out the major boxes:
                         var newLayout = layout(nodeLocations, links);
                         newLayout.nodes().map(function(node) {
-                          console.log("%cnode","border-bottom:chartreuse solid 3px;",node);
                           node.participant.setLocation(node.x,node.y);
                         });
 
@@ -314,8 +275,9 @@ console.log("%cnodeLocations","color:turquoise;font-weight:bold;",nodeLocations)
                     .avoidOverlaps(true) // force non-overlap
                     .links(linkIds)
                     .constraints([{
-                        type: "alignment",
-                        axis: "x",
+                        gap:10,
+                        top:10,
+                        bottom:50,
                         offsets: [{
                                 node: 0,
                                 offset: 0
@@ -330,15 +292,31 @@ console.log("%cnodeLocations","color:turquoise;font-weight:bold;",nodeLocations)
                 return layout;
             }
 
+            var Title = Backbone.View.extend({
+                initialize: function() {
+                    this.render();
+                    this.listenTo(this.model, "change", this.render);
+                },
+                render: function() {
+                  var ids = model.get("interactions").models[0].get("identifiers"),
+                  title;
+                  ids.map(function(id){
+                    //this might be a little fragile. Will they all have Intact IDs? haha.
+                    if (id.db === "intact") {
+                      title = id.id;
+                    }
+                  });
+                    this.$el.html(title);
+                }
+              });
 
-
-            //  console.log("%cx","color:turquoise;font-weight:bold;",x);
             new ComplexView({
                 model: model,
                 el: document.getElementById('mi-sbgn')
             });
             new Title({
-                el: document.getElementById
+                model:model,
+                el: document.getElementById('complextitle')
             });
         });
     });
