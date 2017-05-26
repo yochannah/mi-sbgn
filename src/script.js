@@ -3,11 +3,39 @@ var styles = {
         corners: 5,
         leftOffset: 2,
         padding: 2,
-        infoWidth : 30 },
+        infoWidth: 30
+    },
     uoiTypes = {
         protein: "mt:prot",
         binding: "ct:bind"
     };
+
+function Graph() {
+    this.graph = {
+        nodes: [],
+        links: [],
+        nodeIndexLookup: {}
+
+    };
+    this.addNode = function(node) {
+        this.graph.nodeIndexLookup[node.model.cid] = this.graph.nodes.length;
+        this.graph.nodes.push(node);
+    };
+    this.addLink = function(source, target) {
+        var sourceindex = this.graph.nodeIndexLookup[source],
+            targetindex = this.graph.nodeIndexLookup[target];
+        this.graph.links.push({
+            source: sourceindex,
+            target: targetindex,
+        });
+        console.log("%cthis.graph.links", "border-bottom:chartreuse solid 3px;", this.graph.links, this.graph.nodeIndexLookup, this.graph.nodes);
+    };
+    this.addLinks = function(){
+      this.graph.nodes.map(function(aNode) {
+        aNode.addLinks();
+      });
+    }
+}
 
 //This is syntactic sugar.
 var setAttr = function(elem, x, y) {
@@ -15,10 +43,10 @@ var setAttr = function(elem, x, y) {
     },
     createElem = function(elemName) {
         return document.createElementNS("http://www.w3.org/2000/svg", elemName);
-    }
+    };
 
+var graphView = new Graph();
 
-var interaction;
 document.addEventListener("DOMContentLoaded", function(event) {
     $.get({
         dataType: "json",
@@ -36,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 var rect = createElem("rect");
 
                 setAttr(rect, "width", styles.infoWidth);
-                setAttr(rect, "height", styles.textSize+2);
+                setAttr(rect, "height", styles.textSize + 2);
                 this.node.appendChild(rect);
 
 
@@ -76,6 +104,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 this.count = count + 1;
                 this.node = createElem("g");
 
+                graphView.addNode(this);
+
                 var loc = -45;
                 if (count > 0) {
                     loc = 45;
@@ -85,7 +115,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 text.appendChild(document.createTextNode("binding region"));
                 var rect = this.rect = createElem("rect");
 
-                setAttr(rect, "width", 1.5*styles.infoWidth);
+                setAttr(rect, "width", 1.5 * styles.infoWidth);
                 setAttr(rect, "x", (styles.leftOffset * -3));
                 setAttr(rect, "y", -2 * styles.textSize);
                 setAttr(rect, "rx", 1);
@@ -109,22 +139,34 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 //height is pretty simple so we don't update it.
             }
 
-
-
+            BindingSite.prototype.addLinks = function() {
+              //find links and add them.
+              var links = this.model.get("feature").get("linkedFeatures"),
+                  parent = this;
+              links.models.map(function(linkedFeature) {
+                  var bindingRegions = linkedFeature.get("sequenceData");
+                  bindingRegions.map(function(region) {
+                      console.log("%cregion", "color:turquoise;font-weight:bold;", region, region.cid);
+                      graphView.addLink(parent.model.cid, region.cid);
+                  });
+                  console.log("%clinkedFeature parent%s child %s ", "color:goldenrod;font-weight:bold;", parent.model.cid, linkedFeature.cid, bindingRegions);
+                  //graphView.addLink(parent.model.cid,linkedFeature.cid);
+              });
+            }
 
             function Participant(model) {
-                console.log("%cmodel", "color:firebrick;font-weight:bold;", model);
                 this.init(model);
                 return this;
             }
 
-            var location = 0; // temp var until we get positioning properly
-
-            Participant.prototype.setLocation = function(x,y) {
-              setAttr(this.node, "transform", "translate(" + Math.round(x) + "," + Math.round(y) + ")");
-              console.log("%cthis","color:darkseagreen;font-weight:bold;",this.node);
+            Participant.prototype.setLocation = function(x, y) {
+                setAttr(this.node, "transform", "translate(" + Math.round(x) + "," + Math.round(y) + ")");
+                console.log("%cthis", "color:darkseagreen;font-weight:bold;", this.node);
             }
 
+            Participant.prototype.addLinks = function() {
+              //do nothing but also don't throw an error for not existing
+            }
 
             Participant.prototype.init = function(model) {
                 this.model = model;
@@ -138,7 +180,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                 setAttr(this.node.rect, "rx", 1);
                 setAttr(this.node.rect, "ry", 1);
-
 
                 var text = createElem("text");
                 var label = document.createTextNode(this.interactor.get("label"));
@@ -187,13 +228,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     this.features = false;
                 }
                 if (this.features) {
-                  this.links = [];
-                  var links = [];
-                  this.features.map(function(feature) {
-                    var id1 = parseInt(feature.get("linkedFeatures").models[0].get("id"),10);
-                    var id2 = parseInt(feature.get("id"),10);
-                    links = links.concat(feature.get("linkedFeatures").models);
-                  });
+                    this.links = [];
+                    var links = [];
+                    this.features.map(function(feature) {
+                        var id1 = parseInt(feature.get("linkedFeatures").models[0].get("id"), 10);
+                        var id2 = parseInt(feature.get("id"), 10);
+                        links = links.concat(feature.get("linkedFeatures").models);
+                    });
                 }
             }
 
@@ -214,6 +255,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 className: "sbgnContainer",
                 interactors: model.attributes.interactors.models,
                 participants: [],
+                graph: {
+                    nodes: [],
+                    links: []
+                },
                 initialize: function() {
                     this.render();
                     this.listenTo(this.model, "change", this.render);
@@ -232,50 +277,61 @@ document.addEventListener("DOMContentLoaded", function(event) {
                             var newParticipant = new Participant(participant);
                             parent.el.appendChild(newParticipant.node);
                             parent.participants.push(newParticipant);
+                            graphView.addNode(newParticipant);
                         });
+
+                        graphView.addLinks();
 
                         //once we have the text, we can adjust outlines based on text width
                         parent.participants.map(function(participant) {
                             participant.updateOutlines();
                         });
 
-                        var nodeLocations = [], links = [], nodeIndexLookup = {};
+                        var nodeLocations = [],
+                            links = [],
+                            nodeIndexLookup = {};
                         parent.participants.map(function(participant) {
                             var bb = participant.node.getBBox(),
-                              id = participant.model.get("id");
+                                id = participant.model.get("id");
 
-                              //TODO THIS IS HARDWIRED. Needs to dynamically output all links.
+                            //TODO THIS IS HARDWIRED. Needs to dynamically output all links.
 
-                              //suggest keep a node index lookup table.
-                            nodeLocations.push({width : bb.width,height : bb.height, participant : participant})
-                            links.push({source: 0,target: 1});
-                          });
+                            //suggest keep a node index lookup table.
+                            nodeLocations.push({
+                                width: bb.width,
+                                height: bb.height,
+                                participant: participant
+                            })
+                            links.push({
+                                source: 0,
+                                target: 1
+                            });
+                        });
 
                         //now we need to lay out the major boxes:
                         var newLayout = layout(nodeLocations, links);
                         newLayout.nodes().map(function(node) {
-                          node.participant.setLocation(node.x,node.y);
+                            node.participant.setLocation(node.x, node.y);
                         });
 
                     } catch (e) {
-                        console.log("%ce", "color:navajowhite;font-weight:bold;", e);
+                        console.error("%cerror", "background-color:firebrick; color:#eee;font-weight:bold;", e);
                     }
                     return this;
                 }
-
             });
 
-            function layout(nodeLocations,linkIds) {
-              //drawn from https://github.com/tgdwyer/WebCola/blob/893f1ae744f35b83c59451836065ef0d1897a688/WebCola/test/apitests.ts#L77
+            function layout(nodeLocations, linkIds) {
+                //drawn from https://github.com/tgdwyer/WebCola/blob/893f1ae744f35b83c59451836065ef0d1897a688/WebCola/test/apitests.ts#L77
                 let layout = new cola.Layout()
                     .handleDisconnected(false) // handle disconnected repacks the components which would hide any drift
                     .linkDistance(1)
                     .avoidOverlaps(true) // force non-overlap
                     .links(linkIds)
                     .constraints([{
-                        gap:10,
-                        top:10,
-                        bottom:50,
+                        gap: 10,
+                        top: 10,
+                        bottom: 50,
                         offsets: [{
                                 node: 0,
                                 offset: 0
@@ -296,24 +352,24 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     this.listenTo(this.model, "change", this.render);
                 },
                 render: function() {
-                  var ids = model.get("interactions").models[0].get("identifiers"),
-                  title;
-                  ids.map(function(id){
-                    //this might be a little fragile. Will they all have Intact IDs? haha.
-                    if (id.db === "intact") {
-                      title = id.id;
-                    }
-                  });
+                    var ids = model.get("interactions").models[0].get("identifiers"),
+                        title;
+                    ids.map(function(id) {
+                        //this might be a little fragile. Will they all have Intact IDs? haha.
+                        if (id.db === "intact") {
+                            title = id.id;
+                        }
+                    });
                     this.$el.html(title);
                 }
-              });
+            });
 
             new ComplexView({
                 model: model,
                 el: document.getElementById('mi-sbgn')
             });
             new Title({
-                model:model,
+                model: model,
                 el: document.getElementById('complextitle')
             });
         });
