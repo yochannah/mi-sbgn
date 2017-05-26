@@ -267,8 +267,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             function layout(nodeLocations,linkIds) {
               //drawn from https://github.com/tgdwyer/WebCola/blob/893f1ae744f35b83c59451836065ef0d1897a688/WebCola/test/apitests.ts#L77
-                const nodeSize = 20,
-                    threshold = 0.01;
                 let layout = new cola.Layout()
                     .handleDisconnected(false) // handle disconnected repacks the components which would hide any drift
                     .linkDistance(1)
@@ -287,7 +285,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                                 offset: 0
                             },
                         ]
-                    }]).nodes(nodeLocations)
+                    }]).nodes(nodeLocations);
                 layout.start(); // first layout
                 return layout;
             }
