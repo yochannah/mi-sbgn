@@ -17,6 +17,6 @@ function UnitOfInformation(info) {
     this.node.appendChild(text);
 }
 UnitOfInformation.prototype.updateOutlines = function(parentBB) {
-    var top = parentBB.height - styles.textSize - styles.padding;
-    setAttr(this.node, "transform", "translate(0," + top + ")");
+    var position = (parentBB.height - Math.abs(parentBB.y) - styles.textSize + styles.padding);
+    setAttr(this.node, "transform", "translate(0," + position + ")");
 }

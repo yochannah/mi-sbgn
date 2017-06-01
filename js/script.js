@@ -36,70 +36,72 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     this.render();
                     this.listenTo(this.model, "change", this.render);
                 },
+                updateOutline : function () {
+                  var bb = this.node.getBBox();
+                  //cola sometimes gives us negative margins for some reason, but we don't
+                  //want the layout to be offscreen! that's weird. So we'll
+                  //translate it back in to the screen
+                  setAttr(this.node, "transform", "translate(" + Math.abs(bb.x) + "," + Math.abs(bb.y) +")");
+
+                  //here we're setting the dimensions for our cmplex outline and
+                  //translating it back into the screen as above.
+                  setAttr(this.outline,"x",bb.x);
+                  setAttr(this.outline,"y",bb.y);
+                  setAttr(this.outline,"width",bb.height);
+                  setAttr(this.outline,"height",bb.width);
+                  setAttr(this.outline, "transform", "translate(" + Math.abs(bb.x) + "," + Math.abs(bb.y) +")");
+                },
                 render: function() {
-                    var parent = this;
-                    var mynode = createElem("rect");
-                    setAttr(mynode, "x", 10);
-                    setAttr(mynode, "y", 10);
-                    setAttr(mynode, "height", 300);
-                    this.el.appendChild(mynode);
+                    var parent = this,
+                    outline = this.outline = createElem("rect"),
+                    group = this.node = createElem("g");
+
+                    this.el.appendChild(outline);
+                    this.el.appendChild(group);
 
                     try {
                         //first, instantiate the nodes and print the text
                         model.get("interactions").at(0).get("participants").map(function(participant) {
                             var newParticipant = new Participant(participant);
-                            parent.el.appendChild(newParticipant.node);
+                            group.appendChild(newParticipant.node);
                             parent.participants.push(newParticipant);
                             graphView.addNode(newParticipant);
                         });
 
                         graphView.addLinks();
+                        graphView.updateNodeSizes();
+
+                        //now we need to lay out the major boxes:
+                        var newLayout = layout(graphView.graph.nodes, graphView.graph.links, graphView.groups);
+                        newLayout.nodes().map(function(node) {
+                            node.setLocation(node.x, node.y);
+                        });
 
                         //once we have the text, we can adjust outlines based on text width
                         parent.participants.map(function(participant) {
-                            participant.updateOutlines();
+                          participant.updateOutlines();
                         });
 
-                        var nodeLocations = [],
-                            links = [],
-                            nodeIndexLookup = {};
-                        parent.participants.map(function(participant) {
-                            var bb = participant.node.getBBox(),
-                                id = participant.model.get("id");
+                        this.updateOutline();
 
-                            //TODO THIS IS HARDWIRED. Needs to dynamically output all links.
-
-                            //suggest keep a node index lookup table.
-                            nodeLocations.push({
-                                width: bb.width,
-                                height: bb.height,
-                                participant: participant
-                            })
-                            links.push({
-                                source: 0,
-                                target: 1
-                            });
-                        });
-
-                        //now we need to lay out the major boxes:
-                        var newLayout = layout(nodeLocations, links);
-                        newLayout.nodes().map(function(node) {
-                            node.participant.setLocation(node.x, node.y);
-                        });
+                        console.log("%cthis.node.getBBox()","color:turquoise;font-weight:bold;",this.node.getBBox());
 
                     } catch (e) {
                         console.error("%cerror", "background-color:firebrick; color:#eee;font-weight:bold;", e);
                     }
                     return this;
+                }, instantiateParticipants : function(){
+
                 }
+
             });
 
-            function layout(nodeLocations, linkIds) {
+            function layout(nodeLocations, linkIds, groups) {
                 //drawn from https://github.com/tgdwyer/WebCola/blob/893f1ae744f35b83c59451836065ef0d1897a688/WebCola/test/apitests.ts#L77
                 let layout = new cola.Layout()
-                    .handleDisconnected(false) // handle disconnected repacks the components which would hide any drift
                     .linkDistance(1)
                     .avoidOverlaps(true) // force non-overlap
+                    .nodes(nodeLocations)
                     .links(linkIds)
                     .constraints([{
                         gap: 10,
@@ -114,7 +116,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
                                 offset: 0
                             },
                         ]
-                    }]).nodes(nodeLocations);
+                    }]);
+                layout.groups(groups);
                 layout.start(); // first layout
                 return layout;
             }

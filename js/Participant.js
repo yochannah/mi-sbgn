@@ -5,11 +5,10 @@ function Participant(model) {
 
 Participant.prototype.setLocation = function(x, y) {
     setAttr(this.node, "transform", "translate(" + Math.round(x) + "," + Math.round(y) + ")");
-    console.log("%cthis", "color:darkseagreen;font-weight:bold;", this.node);
 }
 
 Participant.prototype.addLinks = function() {
-    //do nothing but also don't throw an error for not existing
+  graphView.addGroup(this.bindingSites,this.model.cid);
 }
 
 Participant.prototype.init = function(model) {
@@ -60,7 +59,7 @@ Participant.prototype.updateOutlines = function() {
     setAttr(this.node.rect, "width", (bb.width + (styles.padding * 2)));
     setAttr(this.node.rect, "height", (bb.height + (styles.padding * 2)));
 
-    this.node.uoi.updateOutlines(bb);
+    this.node.uoi.updateOutlines(this.node.getBBox());
 
 }
 
