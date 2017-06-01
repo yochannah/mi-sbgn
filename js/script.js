@@ -10,15 +10,14 @@ var styles = {
         binding: "ct:bind"
     };
 
-//This is syntactic sugar.
+//This is syntactic sugar and is used across all the svg element files as a common util.
 var setAttr = function(elem, x, y) {
         elem.setAttributeNS(null, x, y);
     },
     createElem = function(elemName) {
         return document.createElementNS("http://www.w3.org/2000/svg", elemName);
-    };
-
-var graphView = new Graph();
+    },
+    graphView = new Graph();
 
 document.addEventListener("DOMContentLoaded", function(event) {
     $.get({
@@ -36,62 +35,75 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     this.render();
                     this.listenTo(this.model, "change", this.render);
                 },
-                updateOutline : function () {
-                  var bb = this.node.getBBox();
-                  //cola sometimes gives us negative margins for some reason, but we don't
-                  //want the layout to be offscreen! that's weird. So we'll
-                  //translate it back in to the screen
-                  setAttr(this.node, "transform", "translate(" + Math.abs(bb.x) + "," + Math.abs(bb.y) +")");
+                updateOutline: function() {
+                    var bb = this.node.getBBox();
+                    //cola sometimes gives us negative margins for some reason, but we don't
+                    //want the layout to be offscreen! that's weird. So we'll
+                    //translate it back in to the screen
+                    setAttr(this.node, "transform", "translate(" + Math.abs(bb.x) + "," + Math.abs(bb.y) + ")");
 
-                  //here we're setting the dimensions for our cmplex outline and
-                  //translating it back into the screen as above.
-                  setAttr(this.outline,"x",bb.x);
-                  setAttr(this.outline,"y",bb.y);
-                  setAttr(this.outline,"width",bb.height);
-                  setAttr(this.outline,"height",bb.width);
-                  setAttr(this.outline, "transform", "translate(" + Math.abs(bb.x) + "," + Math.abs(bb.y) +")");
+                    //here we're setting the dimensions for our cmplex outline and
+                    //translating it back into the screen as above.
+                    setAttr(this.outline, "x", bb.x);
+                    setAttr(this.outline, "y", bb.y);
+                    setAttr(this.outline, "width", bb.height);
+                    setAttr(this.outline, "height", bb.width);
+                    setAttr(this.outline, "transform", "translate(" + Math.abs(bb.x) + "," + Math.abs(bb.y) + ")");
                 },
                 render: function() {
-                    var parent = this,
-                    outline = this.outline = createElem("rect"),
-                    group = this.node = createElem("g");
+                    this.outline = createElem("rect");
+                    this.node = createElem("g");
 
-                    this.el.appendChild(outline);
-                    this.el.appendChild(group);
+                    this.el.appendChild(this.outline);
+                    this.el.appendChild(this.node);
 
                     try {
-                        //first, instantiate the nodes and print the text
-                        model.get("interactions").at(0).get("participants").map(function(participant) {
-                            var newParticipant = new Participant(participant);
-                            group.appendChild(newParticipant.node);
-                            parent.participants.push(newParticipant);
-                            graphView.addNode(newParticipant);
-                        });
-
-                        graphView.addLinks();
-                        graphView.updateNodeSizes();
-
-                        //now we need to lay out the major boxes:
-                        var newLayout = layout(graphView.graph.nodes, graphView.graph.links, graphView.groups);
-                        newLayout.nodes().map(function(node) {
-                            node.setLocation(node.x, node.y);
-                        });
-
-                        //once we have the text, we can adjust outlines based on text width
-                        parent.participants.map(function(participant) {
-                          participant.updateOutlines();
-                        });
-
-                        this.updateOutline();
-
-                        console.log("%cthis.node.getBBox()","color:turquoise;font-weight:bold;",this.node.getBBox());
-
+                      //first we create all the elements, but we don't know
+                      //their layout.
+                        this.instantiateParticipants();
+                        //we use cola to calculate layour based on the side of
+                        //the elements, then update the positions.
+                        this.updatePositions();
                     } catch (e) {
                         console.error("%cerror", "background-color:firebrick; color:#eee;font-weight:bold;", e);
                     }
                     return this;
-                }, instantiateParticipants : function(){
+                },
+                instantiateParticipants: function() {
+                    var parent = this;
+                    model.get("interactions").at(0).get("participants").map(function(participant) {
+                        var newParticipant = new Participant(participant);
+                        parent.node.appendChild(newParticipant.node);
+                        parent.participants.push(newParticipant);
+                        graphView.addNode(newParticipant);
+                    });
 
+                },
+                updatePositions : function() {
+                  //first we describe the conceptual graph links (not rendered)
+                  graphView.addLinks();
+
+                  //now we store the sizes of the nodes so cola can calculate
+                  //layour for us
+                  graphView.updateNodeSizes();
+
+                  //now we provide all of our layout details to cola and it
+                  //returns the x and y of each node.
+                  var newLayout = layout(graphView.graph.nodes, graphView.graph.links, graphView.groups);
+                  newLayout.nodes().map(function(node) {
+                      //here we're iteratin through the results from cola and
+                      //drawing the locations on the graph.
+                      node.setLocation(node.x, node.y);
+                  });
+
+                  // once we have the layout, we can draw the outlines of the participants
+                  // each outline requires knowing the x and y of the layout
+                  // so it can't be drawn any earlier.
+                  this.participants.map(function(participant) {
+                      participant.updateOutlines();
+                  });
+
+                  this.updateOutline();
                 }
 
             });
