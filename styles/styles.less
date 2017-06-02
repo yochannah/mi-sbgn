@@ -11,9 +11,12 @@ body {
     font-family: sans-serif;
 }
 
-rect, line {
+line,
+rect, {
     .blackandwhitebox
 }
+
+marker {fill:@fg-color}
 
 text {
     fill: @fg-color;
@@ -23,24 +26,28 @@ text {
     height: 1.5em;
 }
 
-html {height:100vh; padding:0;margin:0;}
+html {
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+}
 
 body {
     background-color: #f3f3f3;
-    min-height:100%;
-    padding:0;
-    margin:0;
-    box-sizing:border-box;
-    display:flex;
-    flex-direction: column
+    min-height: 100%;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
 
-main {width: 100%;
-box-sizing:border-box;
-flex-grow:1;
+main {
+    width: 100%;
+    box-sizing: border-box;
+    flex-grow: 1;
 }
 
-#sbgnContainer,
 svg {
     background: #fff;
     box-shadow: 1px 1px 1px rgba(0,0,0,0.1);

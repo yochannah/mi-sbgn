@@ -12,7 +12,8 @@ function Link(link) {
     setAttr(line, "y1", center.source.y);
     setAttr(line, "x2", center.target.x);
     setAttr(line, "y2", center.target.y);
-    setAttr(line, "class", "f" + count);
+    setAttr(line, "marker-end", "url(#Harpoon)");
+    setAttr(line, "marker-end", "url(#Harpoon)");
     this.link = link;
     this.node = line;
     return this;
