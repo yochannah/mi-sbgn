@@ -39,15 +39,13 @@ BindingSite.prototype.setLocation = function() {
 }
 
 BindingSite.prototype.getCenter = function() {
-  var bb = this.node.getBBox();
-  var center = {
+  var bb = this.node.getBBox(),
+  center = {
     x : (bb.x + (bb.width/2)),
     y : (bb.y + (bb.height/2))
   },
-  convert = makeAbsoluteContext(this.node);
-  console.log("%cconvert()","color:violet;font-weight:bold;",convert(center.x, center.y));
+  convert = Maths.makeAbsoluteContext(this.node);
   return convert(center.x, center.y);
-  //return center;
 }
 
 BindingSite.prototype.addLinks = function() {

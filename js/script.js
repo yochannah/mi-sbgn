@@ -8,7 +8,8 @@ var styles = {
     uoiTypes = {
         protein: "mt:prot",
         binding: "ct:bind"
-    };
+    },
+    svgElementId = "mi-sbgn";
 
 //This is syntactic sugar and is used across all the svg element files as a common util.
 var setAttr = function(elem, x, y) {
@@ -88,7 +89,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     var l = new Link(link).node;
                     parent.links.push(l);
                     parent.node.appendChild(l);
-//console.log("%cnew Link(link)","color:turquoise;fo//nt-weight:bold;",new Link(link));
                   });
                 },
                 instantiateParticipants: function() {
@@ -133,7 +133,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             new ComplexView({
                 model: model,
-                el: document.getElementById('mi-sbgn')
+                el: document.getElementById(svgElementId)
             });
             new Title({
                 model: model,
@@ -142,19 +142,3 @@ document.addEventListener("DOMContentLoaded", function(event) {
         });
     });
 });
-
-/**getting the correct location for translated elements is a nightmare (but a
- necessary one, because we want to use <g> tags to group our elements and the
- only way to locate a <g> correctly is.... translate! Thankfully, this SO person
- is Good People: https://stackoverflow.com/questions/26049488/how-to-get-absolute-coordinates-of-object-inside-a-g-group
-**/
-function makeAbsoluteContext(element) {
-  return function(x,y) {
-    var offset = document.getElementById("mi-sbgn").getBoundingClientRect();
-    var matrix = element.getScreenCTM();
-    return {
-      x: (matrix.a * x) + (matrix.c * y) + matrix.e - offset.left,
-      y: (matrix.b * x) + (matrix.d * y) + matrix.f - offset.top
-    };
-  };
-}

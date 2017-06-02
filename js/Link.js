@@ -3,7 +3,6 @@
 var count = 0;
 function Link(link) {
   count++;
-  //console.log("%clink Source ", "color:turquoise;font-weight:bold;", link.source.getCenter(), "target", link.target.getCenter());
     var center = {
             source: link.source.getCenter(),
             target: link.target.getCenter()
@@ -16,6 +15,5 @@ function Link(link) {
     setAttr(line, "class", "f" + count);
     this.link = link;
     this.node = line;
-    console.log("%cthis.node","color:turquoise;font-weight:bold;",this.node);
     return this;
 }
