@@ -11,7 +11,7 @@ body {
     font-family: sans-serif;
 }
 
-rect {
+rect, line {
     .blackandwhitebox
 }
 
@@ -23,19 +23,35 @@ text {
     height: 1.5em;
 }
 
+html {height:100vh; padding:0;margin:0;}
+
 body {
     background-color: #f3f3f3;
+    min-height:100%;
+    padding:0;
+    margin:0;
+    box-sizing:border-box;
+    display:flex;
+    flex-direction: column
+}
+
+main {width: 100%;
+box-sizing:border-box;
+flex-grow:1;
 }
 
 #sbgnContainer,
 svg {
-    width: 100%;
-    height: 80vh;
     background: #fff;
     box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
     border-radius: 2px;
     font-family: courier, monospace;
 }
+
+line.f1 {stroke:red;stroke-width:4}
+line.f2 {stroke:green;stroke-width:3}
+line.f3 {stroke:blue;stroke-width:2}
+line.f4 {stroke:violet;stroke-width:1}
 
 .red {
     stroke: red;

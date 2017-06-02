@@ -51,8 +51,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     setAttr(this.outline, "transform", "translate(" + Math.abs(bb.x) + "," + Math.abs(bb.y) + ")");
                 },
                 render: function() {
+
+
                     this.outline = createElem("rect");
                     this.node = createElem("g");
+
+
 
                     this.el.appendChild(this.outline);
                     this.el.appendChild(this.node);
@@ -64,10 +68,28 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         //we use cola to calculate layour based on the side of
                         //the elements, then update the positions.
                         this.updatePositions();
+                        this.expandToFitParent();
+
+                        //links are rendered last after all the positioning
+                        //nitty gritty is done
                     } catch (e) {
                         console.error("%cerror", "background-color:firebrick; color:#eee;font-weight:bold;", e);
                     }
                     return this;
+                },
+                expandToFitParent : function(){
+                  var bb = this.el.getBBox();
+                  this.$el.attr("viewBox", "0 0 " + (bb.width + 10) + " " + (bb.height + 10));
+                },
+                renderLinks : function(){
+                  this.links = [];
+                  var parent = this;
+                  graphView.graph.links.map(function(link){
+                    var l = new Link(link).node;
+                    parent.links.push(l);
+                    parent.node.appendChild(l);
+//console.log("%cnew Link(link)","color:turquoise;fo//nt-weight:bold;",new Link(link));
+                  });
                 },
                 instantiateParticipants: function() {
                     var parent = this;
@@ -103,6 +125,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                       participant.updateOutlines();
                   });
 
+                  this.renderLinks();
                   this.updateOutline();
                 }
 
@@ -119,3 +142,19 @@ document.addEventListener("DOMContentLoaded", function(event) {
         });
     });
 });
+
+/**getting the correct location for translated elements is a nightmare (but a
+ necessary one, because we want to use <g> tags to group our elements and the
+ only way to locate a <g> correctly is.... translate! Thankfully, this SO person
+ is Good People: https://stackoverflow.com/questions/26049488/how-to-get-absolute-coordinates-of-object-inside-a-g-group
+**/
+function makeAbsoluteContext(element) {
+  return function(x,y) {
+    var offset = document.getElementById("mi-sbgn").getBoundingClientRect();
+    var matrix = element.getScreenCTM();
+    return {
+      x: (matrix.a * x) + (matrix.c * y) + matrix.e - offset.left,
+      y: (matrix.b * x) + (matrix.d * y) + matrix.f - offset.top
+    };
+  };
+}

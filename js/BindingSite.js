@@ -21,22 +21,33 @@ function BindingSite(model, count) {
     setAttr(text, "y", "-1");
     setAttr(text, "font-size", styles.textSize);
     this.node.appendChild(text);
-    this.node.appendChild(new UnitOfInformation("binding").node);
+    this.uoi = new UnitOfInformation("binding");
+    this.node.appendChild(this.uoi.node);
     this.node.appendChild(new StateVariable(model.get("pos")).node);
     return this;
 }
 
 BindingSite.prototype.updateOutlines = function() {
-    bb = this.node.getBBox();
+    var bb = this.node.getBBox();
     setAttr(this.rect, "x", (bb.x - styles.padding));
     setAttr(this.rect, "width", (bb.width + (styles.padding * 2)));
     //height is pretty simple so we don't update it.
 }
 
 BindingSite.prototype.setLocation = function() {
-  //todo: - doesn't work
-//  console.log("%cx","color:darkseagreen;font-weight:bold;",this.x, "y", this.y);
     setAttr(this.node, "transform", "translate(" + this.x + "," + this.y +")");
+}
+
+BindingSite.prototype.getCenter = function() {
+  var bb = this.node.getBBox();
+  var center = {
+    x : (bb.x + (bb.width/2)),
+    y : (bb.y + (bb.height/2))
+  },
+  convert = makeAbsoluteContext(this.node);
+  console.log("%cconvert()","color:violet;font-weight:bold;",convert(center.x, center.y));
+  return convert(center.x, center.y);
+  //return center;
 }
 
 BindingSite.prototype.addLinks = function() {
