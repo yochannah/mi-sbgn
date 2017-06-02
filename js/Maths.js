@@ -14,7 +14,12 @@ var Maths = {
         y: (matrix.b * x) + (matrix.d * y) + matrix.f - offset.top
       };
     };
+  },
+  intersection: function(line1, line2) {
+    //maths go here :D
+  },
+  boxLineIntersection: function(box, line) {
+    //maths here to deconstruct the box into 4 lines and see if any of them
+    //intersect with the box. Return which line and the coords.
   }
-
-
 };
