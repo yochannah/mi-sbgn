@@ -43,23 +43,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     //translate it back in to the screen
                     setAttr(this.node, "transform", "translate(" + Math.abs(bb.x) + "," + Math.abs(bb.y) + ")");
 
-                    //here we're setting the dimensions for our cmplex outline and
-                    //translating it back into the screen as above.
-                    setAttr(this.outline, "x", bb.x);
-                    setAttr(this.outline, "y", bb.y);
-                    setAttr(this.outline, "width", bb.height);
-                    setAttr(this.outline, "height", bb.width);
-                    setAttr(this.outline, "transform", "translate(" + Math.abs(bb.x) + "," + Math.abs(bb.y) + ")");
                 },
                 render: function() {
 
 
-                    this.outline = createElem("rect");
                     this.node = createElem("g");
-
-
-
-                    this.el.appendChild(this.outline);
                     this.el.appendChild(this.node);
 
                     try {

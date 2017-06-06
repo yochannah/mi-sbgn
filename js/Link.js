@@ -1,13 +1,16 @@
 //It's dangeous to go alone! Take this! <=========(--o
 //I may have spent far too long getting Link's sword just right.
-var count = 0;
 function Link(link) {
-  count++;
     var center = {
             source: link.source.getCenter(),
             target: link.target.getCenter()
         },
         line = createElem("line");
+
+    //using the old coords, calculate a line that doesn't overlap the box
+    center.source = this.resolveEndpoint(link.source, center);
+    center.target = this.resolveEndpoint(link.target, center);
+
     setAttr(line, "x1", center.source.x);
     setAttr(line, "y1", center.source.y);
     setAttr(line, "x2", center.target.x);
@@ -17,4 +20,8 @@ function Link(link) {
     this.link = link;
     this.node = line;
     return this;
+}
+
+Link.prototype.resolveEndpoint = function(box,line) {
+  return Maths.boxLineIntersection(box,line);
 }
