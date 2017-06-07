@@ -30,11 +30,6 @@ function Graph() {
       })
     }
 
-var f = {    "groups":[
-  {"leaves":[0], "groups":[1]},
-  {"leaves":[1,2]},
-  {"leaves":[3,4]}
-]}
     this.addGroup = function(group, parentCid){
       var g = {leaves : [] }
       parent = this;
