@@ -6,20 +6,35 @@
     <title>Complex SBGN viewer</title>
     <link rel="stylesheet" href="styles/styles.css" type="text/css">
 </head>
-
 <body>
+  <svg id="def" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="Harpoon" viewBox="0 0 70 70" refX="35" refY="35"
+      markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0,0 70,35 0,70 35,35 Z" />
+    </marker>
+  </defs>
+</svg>
+
+
     <header>
-        <h1>MI-SBGN complex viewer</h1>
-        <h2 id="complextitle"></h2>
+        <div>
+            <h1>MI-SBGN complex viewer</h1>
+            <h2 id="complextitle"></h2>
+        </div>
+        <aside>
+          <label>Select a complex
+          <select id="complexSelector">
+            <option>EBI-10828997</option>
+            <option>EBI-9997373</option>
+            <option>EBI-9008420</option>
+            <option>EBI-8869931</option>
+          </select>
+        </label>
+        </aside>
     </header>
     <main>
         <svg id="mi-sbgn" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <marker id="Harpoon" viewBox="0 0 70 70" refX="35" refY="35"
-            markerWidth="8" markerHeight="8" orient="auto">
-          <path d="M 0,0 70,35 0,70 35,35 Z" />
-        </marker>
-      </defs>
     </svg>
     </main>
     <script src="node_modules/webcola/WebCola/cola.min.js" charset="utf-8"></script>
@@ -30,6 +45,7 @@
     <script src="js/external/line-segments-intersect.js"></script>
     <script src="js/layoutmanager.js"></script>
     <script src="js/Graph.js"></script>
+    <script src="js/ComplexView.js"></script>
     <script src="js/Maths.js"></script>
     <script src="js/script.js"></script>
     <script src="js/Title.js"></script>

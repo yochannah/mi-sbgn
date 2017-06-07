@@ -66,9 +66,12 @@ BindingSite.prototype.addLinks = function() {
       parent = this;
   links.models.map(function(linkedFeature) {
       var bindingRegions = linkedFeature.get("sequenceData");
+      if (bindingRegions) {
       bindingRegions.map(function(region) {
           graphView.addLink(parent.model.cid, region.cid);
       });
-      //graphView.addLink(parent.model.cid,linkedFeature.cid);
+    } else {
+      console.log("%cthis","color:turquoise;font-weight:bold;",this);
+    }
   });
 }

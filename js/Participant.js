@@ -85,7 +85,12 @@ Participant.prototype.initBindingSites = function() {
     var binding = [];
     if (this.features) {
         this.features.map(function(feature) {
-            binding = binding.concat(feature.get("sequenceData").models);
+          var seq = feature.get("sequenceData").models;
+          if(seq) {
+            binding = binding.concat(seq);
+          } else {
+            console.log("%cfeature","color:turquoise;font-weight:bold;",feature);
+          }
         });
         if (binding.length > 0) {
             this.bindingSites = binding;
