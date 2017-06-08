@@ -34,7 +34,6 @@ function Graph() {
         if (l2) {
             l2isLinkedTol1 = (l2.indexOf(link1) !== -1);
         }
-        console.log("%c l1isLinkedTol2 && l2isLinkedTol1", "color:cornflowerblue;font-family:sans-serif;", l1, l1isLinkedTol2, l2, l2isLinkedTol1);
         return l1isLinkedTol2 || l2isLinkedTol1;
     }
     this.addLink = function(source, target) {
@@ -42,7 +41,6 @@ function Graph() {
         var sourceindex = this.graph.nodeIndexLookup[source],
             targetindex = this.graph.nodeIndexLookup[target],
             duplicatelink = this.isDuplicate(sourceindex, targetindex);
-        console.log("%cduplicatelink", "color:turquoise;font-weight:bold;", sourceindex, "->", targetindex, ". Dupe? ", duplicatelink);
         if (!duplicatelink) {
             this.addLinkIndexes(sourceindex, targetindex);
             this.graph.links.push({

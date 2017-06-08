@@ -4,7 +4,7 @@ function UnitOfInformation(info) {
     setAttr(this.node, "transform", "translate(0,3)")
     var text = createElem("text")
     text.appendChild(document.createTextNode(this.info));
-    var rect = createElem("rect");
+    var rect = this.rect = createElem("rect");
 
     setAttr(rect, "width", styles.infoWidth);
     setAttr(rect, "height", styles.textSize + 2);

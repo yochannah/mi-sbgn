@@ -8,8 +8,8 @@ Participant.prototype.setLocation = function(x, y) {
 }
 
 Participant.prototype.addLinks = function() {
-  var groupMembers = this.bindingSites.concat(this.label);
-  graphView.addGroup(this.bindingSites,this.model.cid);
+    var groupMembers = this.bindingSites.concat(this.label);
+    graphView.addGroup(this.bindingSites, this.model.cid);
 }
 
 Participant.prototype.init = function(model) {
@@ -25,14 +25,12 @@ Participant.prototype.init = function(model) {
     setAttr(this.node.rect, "rx", 1);
     setAttr(this.node.rect, "ry", 1);
 
-    this.label = new Label(this.interactor.get("label")),
-    parentId = this.interactor.cid;
-    graphView.addNode(this.label, parentId);
+    this.label = new Label(this.interactor.get("label"));
+    graphView.addNode(this.label, this.interactor.cid);
 
     this.node.appendChild(this.label.node);
 
     this.node.uoi = new UnitOfInformation(this.interactor.get("type").name);
-  //  this.node.appendChild(this.node.uoi.node);
 
     if (this.bindingSites) {
         var parent = this;
@@ -59,8 +57,8 @@ Participant.prototype.updateOutlines = function() {
     setAttr(this.node.rect, "width", (bb.width + (styles.padding * 2)));
     setAttr(this.node.rect, "height", (bb.height + (styles.padding * 2)));
 
-    this.node.uoi.updateOutlines(this.node.getBBox());
-
+    this.node.appendChild(this.node.uoi.node);
+    this.node.uoi.updateOutlines(this.node.rect.getBBox());
 }
 
 Participant.prototype.initFeatures = function() {
@@ -85,12 +83,12 @@ Participant.prototype.initBindingSites = function() {
     var binding = [];
     if (this.features) {
         this.features.map(function(feature) {
-          var seq = feature.get("sequenceData").models;
-          if(seq) {
-            binding = binding.concat(seq);
-          } else {
-            console.log("%cfeature","color:turquoise;font-weight:bold;",feature);
-          }
+            var seq = feature.get("sequenceData").models;
+            if (seq) {
+                binding = binding.concat(seq);
+            } else {
+                console.log("%cfeature", "color:turquoise;font-weight:bold;", feature);
+            }
         });
         if (binding.length > 0) {
             this.bindingSites = binding;
