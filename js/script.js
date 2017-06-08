@@ -22,10 +22,10 @@ var setAttr = function(elem, x, y) {
     complexViewer = null;
 
 document.addEventListener("DOMContentLoaded", function(event) {
-//  initViewer("EBI-10828997");
+  initViewer("EBI-10828997");
 //  initViewer("EBI-9997373");
 //  initViewer("EBI-9008420");
-  initViewer("EBI-8869931");
+//  initViewer("EBI-8869931");
 });
 
 ////// Selector for complexes:

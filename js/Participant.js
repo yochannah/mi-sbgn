@@ -8,6 +8,7 @@ Participant.prototype.setLocation = function(x, y) {
 }
 
 Participant.prototype.addLinks = function() {
+  var groupMembers = this.bindingSites.concat(this.label);
   graphView.addGroup(this.bindingSites,this.model.cid);
 }
 
@@ -24,15 +25,14 @@ Participant.prototype.init = function(model) {
     setAttr(this.node.rect, "rx", 1);
     setAttr(this.node.rect, "ry", 1);
 
-    var text = createElem("text");
-    var label = document.createTextNode(this.interactor.get("label"));
-    text.appendChild(label);
-    setAttr(text, "font-size", styles.textSize);
+    this.label = new Label(this.interactor.get("label")),
+    parentId = this.interactor.cid;
+    graphView.addNode(this.label, parentId);
 
-    this.node.appendChild(text);
+    this.node.appendChild(this.label.node);
 
     this.node.uoi = new UnitOfInformation(this.interactor.get("type").name);
-    this.node.appendChild(this.node.uoi.node);
+  //  this.node.appendChild(this.node.uoi.node);
 
     if (this.bindingSites) {
         var parent = this;

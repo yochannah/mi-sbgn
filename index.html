@@ -6,13 +6,18 @@
     <title>Complex SBGN viewer</title>
     <link rel="stylesheet" href="styles/styles.css" type="text/css">
 </head>
+
 <body>
-  <svg id="def" xmlns="http://www.w3.org/2000/svg">
+    <svg id="def" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <marker id="Harpoon" viewBox="0 0 70 70" refX="35" refY="35"
       markerWidth="8" markerHeight="8" orient="auto">
       <path d="M 0,0 70,35 0,70 35,35 Z" />
     </marker>
+    <marker id="Upside-down-harpoon" viewBox="0 0 70 70" refX="35" refY="35"
+    markerWidth="8" markerHeight="8" orient="auto">
+    <path d="M 0,0 70,35 0,70 35,35 Z" transform="rotate(180 35 35)"/>
+  </marker>
   </defs>
 </svg>
 
@@ -23,7 +28,7 @@
             <h2 id="complextitle"></h2>
         </div>
         <aside>
-          <label>Select a complex
+            <label>Select a complex
           <select id="complexSelector">
             <option>EBI-10828997</option>
             <option>EBI-9997373</option>
@@ -54,6 +59,7 @@
     <script src="js/UnitOfInformation.js"></script>
     <script src="js/StateVariable.js"></script>
     <script src="js/BindingSite.js"></script>
+    <script src="js/ParticipantLabel.js"></script>
 </body>
 
 </html>

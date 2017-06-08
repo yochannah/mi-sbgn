@@ -16,7 +16,7 @@ function Link(link) {
     setAttr(line, "x2", center.target.x);
     setAttr(line, "y2", center.target.y);
     setAttr(line, "marker-end", "url(#Harpoon)");
-    setAttr(line, "marker-end", "url(#Harpoon)");
+    setAttr(line, "marker-start", "url(#Upside-down-harpoon)");
     this.link = link;
     this.node = line;
     return this;
@@ -24,4 +24,8 @@ function Link(link) {
 
 Link.prototype.resolveEndpoint = function(box,line) {
   return Maths.boxLineIntersection(box,line);
+}
+
+Link.prototype.equals = function(link) {
+  return (((this.link.target === link.link.target) && (this.link.source === link.link.source)) || ((this.link.target === link.link.source) && (this.link.source === link.link.target)))
 }
