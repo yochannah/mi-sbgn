@@ -8,7 +8,8 @@ function BindingSite(model, count) {
     var text = createElem("text")
     text.appendChild(document.createTextNode("binding region"));
     var rect = this.rect = createElem("rect");
-
+    this.width = 1.5 * styles.infoWidth;
+    this.height = styles.textSize * 3;
     setAttr(rect, "width", 1.5 * styles.infoWidth);
     setAttr(rect, "x", (styles.leftOffset * -3));
     setAttr(rect, "y", -2 * styles.textSize);

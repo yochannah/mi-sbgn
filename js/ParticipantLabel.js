@@ -1,6 +1,8 @@
 function Label(textContent, parentId) {
   this.node = createElem("text");
   setAttr(this.node, "font-size", styles.textSize);
+  this.width= styles.textSize * 3;
+  this.height= styles.textSize * 2 ;
 
   this.node.appendChild(document.createTextNode(textContent));
   this.model = {cid: parentId + "-label"};

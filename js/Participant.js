@@ -16,6 +16,8 @@ Participant.prototype.init = function(model) {
     this.model = model;
     this.node = createElem("g");
     this.interactor = this.model.get("interactor");
+    this.width = 200;
+    this.height = 300;
     this.initFeatures();
     this.initBindingSites();
 
@@ -25,7 +27,7 @@ Participant.prototype.init = function(model) {
     setAttr(this.node.rect, "rx", 1);
     setAttr(this.node.rect, "ry", 1);
 
-    this.label = new Label(this.interactor.get("label"));
+    this.label = new Label(this.interactor.get("label"), this.interactor.cid);
     graphView.addNode(this.label, this.interactor.cid);
 
     this.node.appendChild(this.label.node);
