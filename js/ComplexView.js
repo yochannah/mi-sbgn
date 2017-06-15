@@ -24,6 +24,7 @@ var ComplexView = Backbone.View.extend({
           //their layout.
           this.instantiateParticipants();
           graphView.addLinks();
+          console.log("%c,this","color:turquoise;font-weight:bold;",this);
 
         //  this.expandToFitParent();
 
@@ -35,18 +36,21 @@ var ComplexView = Backbone.View.extend({
                  .handleDisconnected(false)
                  .size([width, height]);
 console.log("%clinks","color:cornflowerblue;font-family:sans-serif;",graphView.graph.links);
-console.log("%cgroups","color:darkseagreen;font-weight:bold;",JSON.stringify(graphView.graph.groups),$.extend({},graphView.graph.groups));
+console.log("%cgroups","color:darkseagreen;font-weight:bold;",JSON.stringify(graphView.graph.groups),$.extend({},graphView.graph.groups), graphView.graph.groups);
+
+var groupBackup = graphView.graph.groups.slice();
 
 
 try{
                  c.nodes(graphView.graph.nodes)
                    .links(graphView.graph.links)
-                   .groups($.extend({},true,graphView.graph.groups));
+                   .groups(graphView.graph.groups);
                   }
                   catch(e) {
                     console.log("%ce","border-bottom:chartreuse solid 3px;",e);
-console.log("%cthis","color:turquoise;font-weight:bold;",c._groups);
+console.log("%cthis","color:turquoise;font-weight:bold;",c._groups,graphView.graph.groups);
                   }
+                //  c._groups[0].groups = graphView.graph.groups[0].groups = groupBackup[0].groups;
                    c.start();
 
                  var svg = d3.select(this.el);
@@ -55,12 +59,24 @@ console.log("%cthis","color:turquoise;font-weight:bold;",c._groups);
           .data(graphView.graph.groups)
           .enter().append("rect")
           .attr("rx", 8).attr("ry", 8)
+          .attr("width", function (d) {
+            console.log("%cd.bounds.y","color:turquoise;font-weight:bold;",d);
+            return d.bounds.X -d.bounds.x; })
+
+            .attr("height", function (d) {
+               return d.bounds.Y - d.bounds.y;
+             })
+             .attr("x", function (d) {
+               return d.bounds.x; })
+
+               .attr("y", function (d) {
+                  return d.bounds.y;
+                })
+
           .attr("class", "group")
           .call(c.drag);
 
           try {
-
-            console.log("%cgraphView.graph.links","color:cornflowerblue;font-family:sans-serif;",graphView.graph.links);
         var link = svg.selectAll(".link")
             .data(graphView.graph.links)
             .enter().append("line")
@@ -124,7 +140,10 @@ console.log("%cthis","color:turquoise;font-weight:bold;",c._groups);
         this.model.get("interactions").at(0).get("participants").map(function(participant) {
             var newParticipant = new Participant(participant);
             parent.participants.push(newParticipant);
-            graphView.addNode(newParticipant);
+          //  graphView.addNode(newParticipant);
+        });
+        this.participants.map(function(participant){
+          participant.addGroup();
         });
 
     },

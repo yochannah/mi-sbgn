@@ -6,6 +6,7 @@ function Label(textContent, parentId) {
 
   this.node.appendChild(document.createTextNode(textContent));
   this.model = {cid: parentId + "-label"};
+  this.cid = this.model.cid;
 
   return this;
 }

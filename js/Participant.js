@@ -7,17 +7,15 @@ Participant.prototype.setLocation = function(x, y) {
     setAttr(this.node, "transform", "translate(" + Math.round(x) + "," + Math.round(y) + ")");
 }
 
-Participant.prototype.addLinks = function() {
+Participant.prototype.addGroup = function() {
     var groupMembers = this.bindingSites.concat(this.label);
-    graphView.addGroup(this.bindingSites, this.model.cid);
+    graphView.addGroup(groupMembers, this.model.cid);
 }
 
 Participant.prototype.init = function(model) {
     this.model = model;
     this.node = createElem("g");
     this.interactor = this.model.get("interactor");
-    this.width = 200;
-    this.height = 300;
     this.initFeatures();
     this.initBindingSites();
 

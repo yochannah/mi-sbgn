@@ -58,21 +58,29 @@ function Graph() {
     }
 
     this.addGroup = function(group, parentCid) {
+      console.log("%cgroup","color:cornflowerblue;font-family:sans-serif;",group);
         var g = {
             leaves: []
         }
         parent = this;
+        console.log("%cparent.graph.nodeIndexLookup","color:turquoise;font-weight:bold;",parent.graph.nodeIndexLookup);
         group.map(function(groupMember) {
-            g.leaves.push(parent.graph.nodeIndexLookup[groupMember.cid]);
+          var identifier = groupMember.cid;
+            console.log("%cgroupMember","color:violet;font-family:sans-serif;",groupMember, identifier);
+
+
+
+            g.leaves.push(parent.graph.nodeIndexLookup[identifier]);
         });
-        if (parentCid) {
-            g.groups = [this.graph.nodeIndexLookup[parentCid]];
-        }
+  //      if (parentCid) {
+  //          g.groups = [this.graph.nodeIndexLookup[parentCid]];
+  //      }
         this.graph.groups.push(g);
     };
     this.addLinks = function() {
         //Adds all links for nodes. This needs to be run after all nodes have been created.
         this.graph.nodes.map(function(aNode) {
+//          console.log("%cnode","color:darkseagreen;font-weight:bold;",aNode);
             aNode.addLinks();
         });
     }
