@@ -14,21 +14,13 @@ Participant.prototype.addGroup = function() {
 
 Participant.prototype.init = function(model) {
     this.model = model;
-    this.node = createElem("g");
+    this.node={};
     this.interactor = this.model.get("interactor");
     this.initFeatures();
     this.initBindingSites();
 
-    this.node.rect = createElem("rect");
-    this.node.append(this.node.rect);
-
-    setAttr(this.node.rect, "rx", 1);
-    setAttr(this.node.rect, "ry", 1);
-
     this.label = new Label(this.interactor.get("label"), this.interactor.cid);
     graphView.addNode(this.label, this.interactor.cid);
-
-    this.node.appendChild(this.label.node);
 
     this.node.uoi = new UnitOfInformation(this.interactor.get("type").name);
 
@@ -38,7 +30,6 @@ Participant.prototype.init = function(model) {
         this.bindingSites.map(function(site, i) {
             var newSite = new BindingSite(site, i);
             parent.node.bindingSites.push(newSite);
-            parent.node.appendChild(newSite.node);
         });
     }
 }

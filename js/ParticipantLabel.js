@@ -1,12 +1,10 @@
 function Label(textContent, parentId) {
-  this.node = createElem("text");
-  setAttr(this.node, "font-size", styles.textSize);
-  this.width= styles.textSize * 3;
+  this.width= 100;
   this.height= styles.textSize * 2 ;
 
-  this.node.appendChild(document.createTextNode(textContent));
   this.model = {cid: parentId + "-label"};
   this.cid = this.model.cid;
+  this.name = textContent;
 
   return this;
 }
@@ -18,5 +16,4 @@ Label.prototype.addLinks = function(){
 
 Label.prototype.setLocation = function(x, y){
   //as above. We don't need to do anything, parent manages it.
-      setAttr(this.node, "transform", "translate(" + this.x + "," + this.y +")");
 }

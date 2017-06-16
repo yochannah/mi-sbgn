@@ -13,164 +13,74 @@ var ComplexView = Backbone.View.extend({
         setAttr(this.node, "transform", "translate(" + Math.abs(bb.x) + "," + Math.abs(bb.y) + ")");
 
     },
-    empty : function(){
-      this.$el.html("");
-      this.node = null;
+    empty: function() {
+        this.$el.html("");
+        this.node = null;
     },
     render: function() {
 
         try {
-          //first we create all the elements, but we don't know
-          //their layout.
-          this.instantiateParticipants();
-          graphView.addLinks();
-          console.log("%c,this","color:turquoise;font-weight:bold;",this);
-
-        //  this.expandToFitParent();
-
-             var width = 960,
-                 height = 500;
-             var c = cola.d3adaptor(d3)
-                 .linkDistance(100)
-                 .avoidOverlaps(true)
-                 .handleDisconnected(false)
-                 .size([width, height]);
-console.log("%clinks","color:cornflowerblue;font-family:sans-serif;",graphView.graph.links);
-console.log("%cgroups","color:darkseagreen;font-weight:bold;",JSON.stringify(graphView.graph.groups),$.extend({},graphView.graph.groups), graphView.graph.groups);
-
-var groupBackup = graphView.graph.groups.slice();
-
-
-try{
-                 c.nodes(graphView.graph.nodes)
-                   .links(graphView.graph.links)
-                   .groups(graphView.graph.groups);
-                  }
-                  catch(e) {
-                    console.log("%ce","border-bottom:chartreuse solid 3px;",e);
-console.log("%cthis","color:turquoise;font-weight:bold;",c._groups,graphView.graph.groups);
-                  }
-                //  c._groups[0].groups = graphView.graph.groups[0].groups = groupBackup[0].groups;
-                   c.start();
-
-                 var svg = d3.select(this.el);
-
-          svg.selectAll(".group")
-          .data(graphView.graph.groups)
-          .enter().append("rect")
-          .attr("rx", 8).attr("ry", 8)
-          .attr("width", function (d) {
-            console.log("%cd.bounds.y","color:turquoise;font-weight:bold;",d);
-            return d.bounds.X -d.bounds.x; })
-
-            .attr("height", function (d) {
-               return d.bounds.Y - d.bounds.y;
-             })
-             .attr("x", function (d) {
-               return d.bounds.x; })
-
-               .attr("y", function (d) {
-                  return d.bounds.y;
-                })
-
-          .attr("class", "group")
-          .call(c.drag);
-
-          try {
-        var link = svg.selectAll(".link")
-            .data(graphView.graph.links)
-            .enter().append("line")
-            .attr("class", "link").call(c.drag);
-}catch (e) {console.log("%ce","border-bottom:chartreuse solid 3px;",e);}
-        var pad = 3;
-        var node = svg.selectAll(".node")
-            .data(graphView.graph.nodes)
-           .enter().append("rect")
-           .attr("class", function(d) {
-             console.log("%cd","color:turquoise;font-weight:bold;",d.constructor.name);
-             return "node " + d.constructor.name;
-           })
-           .attr("width", function (d) {
-             return d.width - 2 * pad; })
-
-             .attr("height", function (d) {
-                return d.height - 2 * pad;
-              })
-             .attr("rx", 5).attr("ry", 5)
-             .call(c.drag);
-
-             c.on("tick", function () {
-    link.attr("x1", function (d) { return d.source.x; })
-        .attr("y1", function (d) { return d.source.y; })
-        .attr("x2", function (d) { return d.target.x; })
-        .attr("y2", function (d) { return d.target.y; });
-    node.attr("x", function (d) { return d.x - d.width / 2 + pad; })
-        .attr("y", function (d) { return d.y - d.height / 2 + pad; });
-
-    // group.attr("x", function (d) { return d.bounds.x; })
-    //      .attr("y", function (d) { return d.bounds.y; })
-    //     .attr("width", function (d) { return d.bounds.width(); })
-    //     .attr("height", function (d) { return d.bounds.height(); });
-    // label.attr("x", function (d) { return d.x; })
-    //      .attr("y", function (d) {
-    //          var h = this.getBBox().height;
-    //          return d.y + h/4;
-    //      });
-});
+            //first we create all the elements, but we don't know
+            //their layout.
+            this.instantiateParticipants();
+            graphView.addLinks();
+            //TODO: dynamic sizing
+            //this.expandToFitParent();
+            this.layout = new Layout(this.el);
 
         } catch (e) {
             console.error("%cerror", "background-color:firebrick; color:#eee;font-weight:bold;", e);
         }
         return this;
     },
-    expandToFitParent : function(){
-      var bb = this.el.getBBox();
-      this.$el.attr("viewBox", "0 0 " + (bb.width + 10) + " " + (bb.height + 10));
+    expandToFitParent: function() {
+        var bb = this.el.getBBox();
+        this.$el.attr("viewBox", "0 0 " + (bb.width + 10) + " " + (bb.height + 10));
     },
-    renderLinks : function(){
-      this.links = [];
-      var parent = this;
-      graphView.graph.links.map(function(link){
-        var l = new Link(link).node;
-        parent.links.push(l);
-      });
+    renderLinks: function() {
+        this.links = [];
+        var parent = this;
+        graphView.graph.links.map(function(link) {
+            var l = new Link(link).node;
+            parent.links.push(l);
+        });
     },
     instantiateParticipants: function() {
         var parent = this;
         this.model.get("interactions").at(0).get("participants").map(function(participant) {
             var newParticipant = new Participant(participant);
             parent.participants.push(newParticipant);
-          //  graphView.addNode(newParticipant);
+            //  graphView.addNode(newParticipant);
         });
-        this.participants.map(function(participant){
-          participant.addGroup();
+        this.participants.map(function(participant) {
+            participant.addGroup();
         });
 
     },
-    updatePositions : function() {
-      //first we describe the conceptual graph links (not rendered)
+    updatePositions: function() {
+        //first we describe the conceptual graph links (not rendered)
 
-      //now we store the sizes of the nodes so cola can calculate
-      //layour for us
-      graphView.updateNodeSizes();
+        //now we store the sizes of the nodes so cola can calculate
+        //layour for us
+        graphView.updateNodeSizes();
 
-      //now we provide all of our layout details to cola and it
-      //returns the x and y of each node.
-      var newLayout = layout(graphView.graph.nodes, graphView.graph.links, graphView.groups);
-      newLayout.nodes().map(function(node) {
-          //here we're iteratin through the results from cola and
-          //drawing the locations on the graph.
-          node.setLocation(node.x, node.y);
-      });
+        //now we provide all of our layout details to cola and it
+        //returns the x and y of each node.
+        var newLayout = layout(graphView.graph.nodes, graphView.graph.links, graphView.groups);
+        newLayout.nodes().map(function(node) {
+            //here we're iteratin through the results from cola and
+            //drawing the locations on the graph.
+            node.setLocation(node.x, node.y);
+        });
 
-      // once we have the layout, we can draw the outlines of the participants
-      // each outline requires knowing the x and y of the layout
-      // so it can't be drawn any earlier.
-      this.participants.map(function(participant) {
-          participant.updateOutlines();
-      });
+        // once we have the layout, we can draw the outlines of the participants
+        // each outline requires knowing the x and y of the layout
+        // so it can't be drawn any earlier.
+        this.participants.map(function(participant) {
+            participant.updateOutlines();
+        });
 
-      this.renderLinks();
-      this.updateOutline();
+        this.renderLinks();
+        this.updateOutline();
     }
 });

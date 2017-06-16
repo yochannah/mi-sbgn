@@ -11,12 +11,16 @@ body {
     font-family: sans-serif;
 }
 
+
+.BindingSite,
 line,
-rect, {
+rect {
     .blackandwhitebox
 }
 
-marker {fill:@fg-color}
+marker {
+    fill: @fg-color
+}
 
 text {
     fill: @fg-color;
@@ -53,7 +57,20 @@ main {
     box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
     border-radius: 2px;
     font-family: courier, monospace;
-    border:solid 3px @fg-color;
+    border: solid 3px @fg-color;
 }
 
-#def {height:0}
+#def {
+    height: 0;
+}
+
+svg {
+    width: 90%;
+    height: 100%;
+}
+
+main {
+    height: 500px;
+}
+
+.Label {stroke:none;}

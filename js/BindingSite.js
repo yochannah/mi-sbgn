@@ -1,30 +1,19 @@
 function BindingSite(model, count) {
     this.model = model;
     this.count = count + 1;
-    this.node = createElem("g");
+    this.name = "binding region";
+    this.cid = this.model.cid;
 
     graphView.addNode(this);
 
     var text = createElem("text")
     text.appendChild(document.createTextNode("binding region"));
     var rect = this.rect = createElem("rect");
-    this.width = 1.5 * styles.infoWidth;
-    this.height = styles.textSize * 3;
-    setAttr(rect, "width", 1.5 * styles.infoWidth);
-    setAttr(rect, "x", (styles.leftOffset * -3));
-    setAttr(rect, "y", -2 * styles.textSize);
-    setAttr(rect, "rx", 1);
-    setAttr(rect, "ry", 1);
-    setAttr(rect, "height", styles.textSize * 3);
-    this.node.appendChild(rect);
+    this.width = 150;
+    this.height = 20;
 
-    setAttr(text, "x", (styles.leftOffset * -2));
-    setAttr(text, "y", "-1");
-    setAttr(text, "font-size", styles.textSize);
-    this.node.appendChild(text);
     this.uoi = new UnitOfInformation("binding");
-    this.node.appendChild(this.uoi.node);
-    this.node.appendChild(new StateVariable(model.get("pos")).node);
+    new StateVariable(model.get("pos"));
     return this;
 }
 
