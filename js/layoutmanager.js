@@ -1,4 +1,5 @@
 function Layout(el) {
+  this.svg = svg = svg = d3.select(el);
     try {
         var width = el.clientWidth,
             height = el.clientHeight;
@@ -12,7 +13,30 @@ function Layout(el) {
             .groups(graphView.graph.groups);
         c.start();
 
-        var svg = d3.select(el);
+
+        svg.append("defs").append("marker")
+    .attr("id", "Harpoon")
+    .attr("viewbox", "0 0 20 20")
+    .attr("refX", 20)
+    .attr("refY", 20)
+    .attr("markerWidth", 40)
+    .attr("markerHeight", 40)
+    .attr("orient", "auto")
+    .append("path")
+    .attr("d", "M 0,0 40,20 0,40 20,20 Z");
+
+    svg.append("defs").append("marker")
+.attr("id", "Upside-down-harpoon")
+.attr("viewbox", "0 0 20 20")
+.attr("refX", 20)
+.attr("refY", 20)
+.attr("markerWidth", 40)
+.attr("markerHeight", 40)
+.attr("orient", "auto")
+.append("path")
+.attr("d", "M 0,20 40,40 20,20 40,0 Z");
+//.attr("d", "M 0,35 70,70 35,35 70,0 Z");
+
 
         var group = svg.selectAll(".group")
             .data(graphView.graph.groups)
@@ -21,10 +45,6 @@ function Layout(el) {
             .attr("class", "group")
             .call(c.drag);
 
-        var link = svg.selectAll(".link")
-            .data(graphView.graph.links)
-            .enter().append("line")
-            .attr("class", "link").call(c.drag);
         var pad = styles.padding;
 
         var node = svg.selectAll(".node")
@@ -46,6 +66,12 @@ function Layout(el) {
                 c.alpha(1); // fire it off again to satify gridify
             });
 
+            var link = svg.selectAll(".link")
+                .data(graphView.graph.links)
+                .enter().append("line")
+                .attr("class", "link")
+                .attr("marker-start", "url(#Upside-down-harpoon)")
+                .attr("marker-end", "url(#Harpoon)").call(c.drag);
 
 
         var label = svg.selectAll(".label")
@@ -56,7 +82,7 @@ function Layout(el) {
                 return d.name;
             })
             .call(c.drag);
-            
+
         node.append("title")
             .text(function(d) {
                 return d.name;
