@@ -9,8 +9,8 @@ function BindingSite(model, count) {
     var text = createElem("text")
     text.appendChild(document.createTextNode("binding region"));
     var rect = this.rect = createElem("rect");
-    this.width = 150;
-    this.height = 20;
+    this.width = 150 + 2*styles.padding;
+    this.height = 20 + 2*styles.padding;
 
     this.uoi = new UnitOfInformation("binding");
     new StateVariable(model.get("pos"));

@@ -2,7 +2,7 @@ var styles = {
         textSize: 5,
         corners: 5,
         leftOffset: 2,
-        padding: 2,
+        padding: 3,
         infoWidth: 30
     },
     uoiTypes = {
@@ -22,9 +22,9 @@ var setAttr = function(elem, x, y) {
     complexViewer = null;
 
 document.addEventListener("DOMContentLoaded", function(event) {
-  initViewer("EBI-10828997");
+//  initViewer("EBI-10828997");
 //  initViewer("EBI-9997373");
-//  initViewer("EBI-9008420");
+  initViewer("EBI-9008420");
 //  initViewer("EBI-8869931");
 });
 

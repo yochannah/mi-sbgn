@@ -59,7 +59,9 @@ function Graph() {
 
     this.addGroup = function(group, parentCid) {
         var g = {
-            leaves: []
+            leaves: [],
+            padding: 3,
+            margin:6
         }
         parent = this;
         group.map(function(groupMember) {

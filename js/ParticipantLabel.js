@@ -1,8 +1,10 @@
+var count = 0;
 function Label(textContent, parentId) {
-  this.width= 100;
-  this.height= styles.textSize * 2 ;
+  count++;
+  this.width= 100 + 2*styles.padding;
+  this.height= 20 + 2*styles.padding;
 
-  this.model = {cid: parentId + "-label"};
+  this.model = {cid: parentId + "-label-" + count};
   this.cid = this.model.cid;
   this.name = textContent;
 

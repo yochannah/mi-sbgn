@@ -1,9 +1,9 @@
 function Layout(el) {
     try {
-        var width = 960,
-            height = 500;
+        var width = el.clientWidth,
+            height = el.clientHeight;
         var c = cola.d3adaptor(d3)
-            .linkDistance(100)
+            .linkDistance(200)
             .avoidOverlaps(true)
             .handleDisconnected(true)
             .size([width, height]);
@@ -25,13 +25,12 @@ function Layout(el) {
             .data(graphView.graph.links)
             .enter().append("line")
             .attr("class", "link").call(c.drag);
-        var pad = 3;
+        var pad = styles.padding;
 
         var node = svg.selectAll(".node")
             .data(graphView.graph.nodes)
             .enter().append("rect")
             .attr("class", function(d) {
-              console.log("%cd","color:turquoise;font-weight:bold;",d);
                 return "node " + d.constructor.name + " " + d.cid;
             })
             .attr("width", function(d) {
@@ -42,7 +41,10 @@ function Layout(el) {
                 return d.height - 2 * pad;
             })
 
-            .call(c.drag);
+            .call(c.drag).on('mouseup', function (d) {
+                d.fixed = 0;
+                c.alpha(1); // fire it off again to satify gridify
+            });
 
 
 
@@ -54,11 +56,11 @@ function Layout(el) {
                 return d.name;
             })
             .call(c.drag);
-            node.append("title")
+            
+        node.append("title")
             .text(function(d) {
                 return d.name;
             });
-
 
         c.on("tick", function() {
             link.attr("x1", function(d) {
@@ -74,41 +76,41 @@ function Layout(el) {
                     return d.target.y;
                 });
 
-                label.attr("x", function(d) {
-                //  console.log("%cthis.getBBox()","border-bottom:chartreuse solid 3px;",this,d);
-                //      updateParent(this.getBBox());
-                   d.height = this.getBBox().height;
-                   d.width = this.getBBox().width;
-                        return d.x;
-                    })
-                    .attr("y", function(d) {
-                        var h = this.getBBox().height;
-                        return d.y + h / 4;
-                    });
+            label.attr("x", function(d) {
+                    d.height = this.getBBox().height;
+                    d.width = this.getBBox().width;
+                    return d.x - d.width / 2 + pad;
+                })
+                .attr("y", function(d) {
+                    var h = this.getBBox().height;
+                    return d.y + h / 4 - pad;
+                });
 
-                    node.attr("x", function(d) {
-                            return d.x-pad ;
-                        })
-                        .attr("y", function(d) {
-                          console.log("%cd","color:cornflowerblue;font-family:sans-serif;",d);
-                            return d.y - pad*2 ;
-                        })
-                        .attr("width",function(d) {return d.width;})
-                        .attr("height",function(d) {return d.height ;});
-                        ;
+            node.attr("x", function(d) {
+                    return d.x - d.width / 2 + pad;
+                })
+                .attr("y", function(d) {
+                    return d.y - pad * 4;
+                })
+                .attr("width", function(d) {
+                    return d.width;
+                })
+                .attr("height", function(d) {
+                    return d.height;
+                });;
 
-                        group.attr("x", function(d) {
-                                return d.bounds.x;
-                            })
-                            .attr("y", function(d) {
-                                return d.bounds.y;
-                            })
-                            .attr("width", function(d) {
-                                return d.bounds.width();
-                            })
-                            .attr("height", function(d) {
-                                return d.bounds.height();
-                            });
+            group.attr("x", function(d) {
+                    return d.bounds.x;
+                })
+                .attr("y", function(d) {
+                    return d.bounds.y;
+                })
+                .attr("width", function(d) {
+                    return d.bounds.width();
+                })
+                .attr("height", function(d) {
+                    return d.bounds.height();
+                });
 
 
         });
