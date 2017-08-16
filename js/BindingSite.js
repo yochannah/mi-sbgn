@@ -2,31 +2,20 @@ function BindingSite(model, count) {
     this.model = model;
     this.count = count + 1;
     this.name = "binding region";
+    this.class = "bindingregion";
     this.cid = this.model.cid;
 
     graphView.addNode(this);
 
-    var text = createElem("text")
-    text.appendChild(document.createTextNode("binding region"));
-    var rect = this.rect = createElem("rect");
-    this.width = 150 + 2*styles.padding;
-    this.height = 20 + 2*styles.padding;
+    this.width = 350 + 2*styles.padding;
+    this.height = 200 + 2*styles.padding;
 
     this.uoi = new UnitOfInformation("binding");
-    new StateVariable(model.get("pos"));
+    this.position = new StateVariable(model.get("pos"));
     return this;
 }
 
-BindingSite.prototype.updateOutlines = function() {
-    var bb = this.node.getBBox();
-    setAttr(this.rect, "x", (bb.x - styles.padding));
-    setAttr(this.rect, "width", (bb.width + (styles.padding * 2)));
-    //height is pretty simple so we don't update it.
-}
 
-BindingSite.prototype.setLocation = function() {
-    setAttr(this.node, "transform", "translate(" + this.x + "," + this.y +")");
-}
 
 BindingSite.prototype.getCenter = function() {
   var bb = this.node.getBBox(),
