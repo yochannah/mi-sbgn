@@ -58,7 +58,7 @@ function Layout(el) {
             })
 
             .attr("height", function(d) {
-                return d.height - 2 * pad;
+                return (d.height - 2 * pad) *4;
             })
             .call(c.drag).on('mouseup', function(d) {
                 d.fixed = 0;
@@ -151,13 +151,13 @@ function Layout(el) {
                     return d.x - d.width / 2 + pad;
                 })
                 .attr("y", function(d) {
-                    return d.y - pad * 4;
+                    return d.y - pad * 4 - d.height;
                 })
                 .attr("width", function(d) {
                     return d.width;
                 })
                 .attr("height", function(d) {
-                    return d.height;
+                    return d.height *3;
                 });;
 
             group.attr("x", function(d) {
