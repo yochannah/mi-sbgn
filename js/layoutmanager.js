@@ -160,6 +160,7 @@ function Layout(el) {
                   //instead, calculate the height based on the two child groups which formthe top and bottom of the group
                   var childnodes = this.parentNode.querySelectorAll("g");
                     var h = childnodes[0].getBBox().y - childnodes[1].getBBox().y;
+                    //HERE WE NEED TO SET THE HEIGHT OF THE DOODAD
                     return h;
                 }).attr("width", function(d) {
                     d.width = this.parentNode.getBBox().width;
