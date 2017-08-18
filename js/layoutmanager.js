@@ -13,7 +13,6 @@ function Layout(el) {
             .groups(graphView.graph.groups);
         c.start();
 
-
         svg.append("defs").append("marker")
             .attr("id", "Harpoon")
             .attr("viewbox", "0 0 20 20")
@@ -51,14 +50,25 @@ function Layout(el) {
             .enter().append("g")
             .attr("class", function(d) {
                 return "node " + d.constructor.name + " " + d.cid;
-            })
-            .append("rect")
-            .attr("width", function(d) {
+            }).attr("width", function(d) {
                 return d.width - 2 * pad;
             })
 
             .attr("height", function(d) {
-                return (d.height - 2 * pad) *4;
+                return (d.height - 2 * pad) * 4;
+            })
+            .call(c.drag).on('mouseup', function(d) {
+                d.fixed = 0;
+                c.alpha(1); // fire it off again to satify gridify
+            });
+
+
+        var rect = node.append("rect")
+            .attr("width", function(d) {
+                return d.width - 2 * pad;
+            })
+            .attr("height", function(d) {
+                return (d.height - 2 * pad) * 4;
             })
             .call(c.drag).on('mouseup', function(d) {
                 d.fixed = 0;
@@ -86,22 +96,27 @@ function Layout(el) {
             svg.selectAll(".BindingSite")
             .append("g");
 
-        var uois = binding.attr("class", "label uoi")
+
+        //uois - e.g ct:bind
+        var uoig = binding.append("g").attr("class", "uoig");
+        var uoirect = uoig.append("rect");
+        var uoitext = uoig.attr("class", "label uoi")
             .append("text")
             .text(function(d) {
                 return d.uoi.info;
             })
             .call(c.drag);
 
+        // location variable
+        var locg = binding.append("g");
+        var locrect = locg.append("rect");
         var locationOfBinding =
-        binding.append("text")
+            locg.append("text")
             .attr("class", "label position")
             .text(function(d) {
                 return d.position.info;
             })
             .call(c.drag);
-        console.log("%cbinding", "color:darkseagreen;font-weight:bold;", binding.data());
-
 
         c.on("tick", function() {
             link.attr("x1", function(d) {
@@ -128,36 +143,77 @@ function Layout(el) {
                 });
 
 
-                uois.attr("x", function(d) {
-                        return d.x - this.getBBox().width / 2;
-                    })
-                    .attr("y", function(d) {
-                        var h = this.getBBox().height;
-                        return d.y - h;
-                    }).attr("height", "20").attr("width", "30")
+            uoig.attr("x", function(d) {
+
+                    return d.x - this.getBBox().width / 2;
+                })
+                .attr("y", function(d) {
+                    var h = this.getBBox().height;
+                    return d.y + h;
+                }).attr("height", "20").attr("width", function(d) {
+                    return this.getBBox().width
+                });
+
+            uoitext.attr("x", function(d) {
+
+                    return d.x - this.getBBox().width / 2;
+                })
+                .attr("y", function(d) {
+                    var h = this.getBBox().height;
+                    return d.y + h;
+                }).attr("height", "20").attr("width", function(d) {
+                    return this.getBBox().width
+                });
+
+            uoirect.attr("x", function(d) {
+
+                    return d.x - this.getBBox().width / 2;
+                })
+                .attr("y", function(d) {
+                    var h = this.getBBox().height;
+                    return d.y + (h/4);
+                }).attr("height", "20").attr("width", function(d) {
+                    return this.parentNode.getBBox().width
+                });
 
 
-                    locationOfBinding.attr("x", function(d) {
-                            return d.x - this.getBBox().width / 2;
-                        })
-                        .attr("y", function(d) {
-                            var h = this.getBBox().height;
-                            return d.y + h;
-                        }).attr("height", "20").attr("width", "30")
+
+            locationOfBinding.attr("x", function(d) {
+                    return d.x - this.getBBox().width / 2;
+                })
+                .attr("y", function(d) {
+                    var h = this.getBBox().height;
+                    return d.y - h;
+                }).attr("height", 2).attr("width", 20)
+
+            locrect.attr("x", function(d, f, g) {
+                    return d.x - this.getBBox().width / 2 + pad;
+                })
+                .attr("rx", "10")
+                .attr("ry", "10")
+                .attr("y", function(d) {
+                    var h = this.getBBox().height;
+                    return d.y + -h * 2;
+                }).attr("height", function(d) {
+                    return d.height;
+                }).attr("width", function(d) {
+                    return this.parentNode.getBBox().width;
+                })
 
 
 
-            node.attr("x", function(d) {
+
+            rect.attr("x", function(d) {
                     return d.x - d.width / 2 + pad;
                 })
                 .attr("y", function(d) {
-                    return d.y - pad * 4 - d.height;
+                    return d.y - pad * 4 - (d.height / 2);
                 })
                 .attr("width", function(d) {
                     return d.width;
                 })
                 .attr("height", function(d) {
-                    return d.height *3;
+                    return d.height * 2;
                 });;
 
             group.attr("x", function(d) {
