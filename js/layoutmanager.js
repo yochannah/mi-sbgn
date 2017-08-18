@@ -36,7 +36,7 @@ function Layout(el) {
             .attr("d", "M 0,20 40,40 20,20 40,0 Z");
 
 
-        var group = svg.selectAll(".group")
+        var group = svg.selectAll(".group interactor")
             .data(graphView.graph.groups)
             .enter().append("rect")
             .attr("rx", 5).attr("ry", 5)
@@ -63,7 +63,24 @@ function Layout(el) {
             });
 
 
-        var rect = node.append("rect")
+        var label = svg.selectAll(".label")
+            .data(graphView.graph.nodes)
+            .enter().append("text")
+            .attr("class", function(d) {
+                if (d.constructor.name == "Label") {
+                    return "label";
+                } else {
+                    return "node";
+                }
+            })
+            .text(function(d) {
+                return d.name;
+            })
+            .call(c.drag);
+
+
+
+        var rect = node.selectAll(".Node").append("rect")
             .attr("width", function(d) {
                 return d.width - 2 * pad;
             })
@@ -82,25 +99,16 @@ function Layout(el) {
             .attr("marker-start", "url(#Upside-down-harpoon)")
             .attr("marker-end", "url(#Harpoon)").call(c.drag);
 
-
-        var label = svg.selectAll(".label")
-            .data(graphView.graph.nodes)
-            .enter().append("text")
-            .attr("class", "label")
-            .text(function(d) {
-                return d.name;
-            })
-            .call(c.drag);
-
         var binding =
             svg.selectAll(".BindingSite")
             .append("g");
+        var bindingborder = binding.append("rect");
 
 
         //uois - e.g ct:bind
         var uoig = binding.append("g").attr("class", "uoig");
         var uoirect = uoig.append("rect");
-        var uoitext = uoig.attr("class", "label uoi")
+        var uoitext = uoig.attr("class", "uoi")
             .append("text")
             .text(function(d) {
                 return d.uoi.info;
@@ -112,7 +120,7 @@ function Layout(el) {
         var locrect = locg.append("rect");
         var locationOfBinding =
             locg.append("text")
-            .attr("class", "label position")
+            .attr("class", "position")
             .text(function(d) {
                 return d.position.info;
             })
@@ -142,9 +150,23 @@ function Layout(el) {
                     return d.y + h / 4 - pad;
                 });
 
+            bindingborder.attr("x", function(d) {
+                    return d.x - this.getBBox().width / 2;
+                })
+                .attr("y", function(d) {
+                    return d.y - d.height*1.5;
+                }).attr("height", function(d) {
+                  //we can't just get the parent bbox size because i grows endlessly bigger with each iteration.
+                  //instead, calculate the height based on the two child groups which formthe top and bottom of the group
+                  var childnodes = this.parentNode.querySelectorAll("g");
+                    var h = childnodes[0].getBBox().y - childnodes[1].getBBox().y;
+                    return h;
+                }).attr("width", function(d) {
+                    d.width = this.parentNode.getBBox().width;
+                    return this.parentNode.getBBox().width;
+                });
 
             uoig.attr("x", function(d) {
-
                     return d.x - this.getBBox().width / 2;
                 })
                 .attr("y", function(d) {
@@ -171,7 +193,7 @@ function Layout(el) {
                 })
                 .attr("y", function(d) {
                     var h = this.getBBox().height;
-                    return d.y + (h/4);
+                    return d.y + (h / 4);
                 }).attr("height", "20").attr("width", function(d) {
                     return this.parentNode.getBBox().width
                 });
