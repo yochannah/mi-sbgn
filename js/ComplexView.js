@@ -24,8 +24,6 @@ var ComplexView = Backbone.View.extend({
             //their layout.
             this.instantiateParticipants();
             graphView.addLinks();
-            //TODO: dynamic sizing
-            //this.expandToFitParent();
             this.layout = new Layout(this.el);
 
         } catch (e) {
@@ -33,10 +31,7 @@ var ComplexView = Backbone.View.extend({
         }
         return this;
     },
-    expandToFitParent: function() {
-        var bb = this.el.getBBox();
-        this.$el.attr("viewBox", "0 0 " + (bb.width + 10) + " " + (bb.height + 10));
-    },
+
     renderLinks: function() {
         this.links = [];
         var parent = this;

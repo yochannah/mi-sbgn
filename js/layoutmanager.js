@@ -124,7 +124,7 @@ function Layout(el) {
                 });
 
             labeltext.attr("x", function(d) {
-                    return d.x - d.width / 2 + pad ;
+                    return d.x - d.width / 2 + pad *2;
                 })
                 .attr("y", function(d) {
                     var h = this.getBBox().height;
@@ -132,13 +132,7 @@ function Layout(el) {
                 });
 
             node.attr("height", function(d) {
-                //            console.log("%cthis, this.getBBox()","color:turquoise;font-weight:bold;",this, this.getBBox());
-                //                  d.height = this.getBBox().height;
-                //HERE WE NEED TO SET THE HEIGHT OF THE DOODAD
-                if (!initialisedSizes) {
-                    console.log("%c init", "color:turquoise;font-weight:bold;", initialisedSizes);
-                    d.height = this.getBBox().height;
-                }
+                d.height = this.getBBox().height;
                 return this.getBBox().height;
             })
 
@@ -157,15 +151,12 @@ function Layout(el) {
                     var h = childnodes[0].getBBox().y - childnodes[1].getBBox().y;
                     return h;
                 }).attr("width", function(d) {
-                    //                    console.log("%c.parentNode.getBBox().width","color:turquoise;font-weight:bold;",this.parentNode.getBBox());
-                    console.log("%cthis","color:turquoise;font-weight:bold;",this.nextSibling.getBBox().width);
                     d.width = this.nextSibling.getBBox().width + 4*pad;
                     return this.nextSibling.getBBox().width + 2*pad;
-                    //return d.width;
                 });
 
             uoig.attr("x", function(d) {
-                    return d.x - this.getBBox().width / 2;
+                    return d.x - this.getBBox().width / 2 + 2*pad;
                 })
                 .attr("y", function(d) {
                     var h = this.getBBox().height;
@@ -222,13 +213,16 @@ function Layout(el) {
 
 
             group.attr("x", function(d) {
-                    return d.bounds.x;
+              console.log("%cd","color:turquoise;font-weight:bold;",d, this.getBBox());
+
+                    return d.bounds.x + pad;
+
                 })
                 .attr("y", function(d) {
                     return d.bounds.y;
                 })
                 .attr("width", function(d) {
-                    return d.bounds.width() ;
+                    return d.bounds.width() - pad;
                 })
                 .attr("height", function(d) {
                     return d.bounds.height();
