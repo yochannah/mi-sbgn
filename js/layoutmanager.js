@@ -73,19 +73,6 @@ function Layout(el) {
             })
             .call(c.drag);
 
-        var rect = node.selectAll(".Node").append("text")
-            .attr("width", function(d) {
-                return d.width - 2 * pad;
-            })
-            .attr("height", function(d) {
-                return (d.height - 2 * pad) * 4;
-            })
-            .call(c.drag).on('mouseup', function(d) {
-                d.fixed = 0;
-                c.alpha(1); // fire it off again to satify gridify
-            });
-
-
         var link = svg.selectAll(".link")
             .data(graphView.graph.links)
             .enter().append("line")
@@ -134,7 +121,7 @@ function Layout(el) {
 
             labeltext.attr("x", function(d) {
                     d.height = this.getBBox().height;
-                    d.width = this.getBBox().width;
+                    d.width = this.getBBox().width + pad*2;
                     return d.x - d.width / 2 + pad;
                 })
                 .attr("y", function(d) {
@@ -224,32 +211,17 @@ function Layout(el) {
                 })
 
 
-
-
-            rect.attr("x", function(d) {
-                    return d.x - d.width / 2 + pad;
-                })
-                .attr("y", function(d) {
-                    return d.y - pad * 4 - (d.height / 2);
-                })
-                .attr("width", function(d) {
-                    return d.width;
-                })
-                .attr("height", function(d) {
-                    return d.height * 2;
-                });;
-
             group.attr("x", function(d) {
-                    return d.bounds.x;
+                    return d.bounds.x - pad ;
                 })
                 .attr("y", function(d) {
-                    return d.bounds.y;
+                    return d.bounds.y - (pad*10);
                 })
                 .attr("width", function(d) {
-                    return d.bounds.width();
+                    return d.bounds.width() + (pad* 2);
                 })
                 .attr("height", function(d) {
-                    return d.bounds.height();
+                    return d.bounds.height()+ (pad* 10);
                 });
 
             initialisedSizes = true;
