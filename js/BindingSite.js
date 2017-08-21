@@ -7,9 +7,6 @@ function BindingSite(model, count) {
 
     graphView.addNode(this);
 
-    this.width = 100 + 2*styles.padding;
-    this.height = 100;
-
     this.uoi = new UnitOfInformation("binding");
     this.position = new StateVariable(model.get("pos"));
     return this;

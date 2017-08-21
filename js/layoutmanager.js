@@ -8,10 +8,18 @@ function Layout(el) {
             .avoidOverlaps(true)
             .handleDisconnected(true)
             .size([width, height]);
+        graphView.graph.nodes.forEach(function(node) {
+            node.height = 21;
+            node.width = 31;
+            node.padding = 14;
+        })
+
         c.nodes(graphView.graph.nodes)
             .links(graphView.graph.links)
             .groups(graphView.graph.groups);
         c.start();
+
+        console.log("%cc", "color:turquoise;font-weight:bold;", c);
 
         svg.append("defs").append("marker")
             .attr("id", "Harpoon")
@@ -50,14 +58,9 @@ function Layout(el) {
             .enter().append("g")
             .attr("class", function(d) {
                 return "node " + d.constructor.name + " " + d.cid;
-            }).attr("width", function(d) {
-                return d.width - 2 * pad;
             })
-
-            .attr("height", function(d) {
-                return (d.height - 2 * pad) * 4;
-            })
-            .call(c.drag).on('mouseup', function(d) {
+            .call(c.drag)
+            .on('mouseup', function(d) {
                 d.fixed = 0;
                 c.alpha(1); // fire it off again to satify gridify
             });
@@ -106,6 +109,7 @@ function Layout(el) {
         var initialisedSizes = false;
 
         c.on("tick", function(x, y, z) {
+              //  debugger;
             link.attr("x1", function(d) {
                     return d.source.x;
                 })
@@ -120,14 +124,23 @@ function Layout(el) {
                 });
 
             labeltext.attr("x", function(d) {
-                    d.height = this.getBBox().height;
-                    d.width = this.getBBox().width + pad*2;
-                    return d.x - d.width / 2 + pad;
+                    return d.x - d.width / 2 + pad ;
                 })
                 .attr("y", function(d) {
                     var h = this.getBBox().height;
-                    return d.y + h / 4 - pad;
+                    return d.y + h * 2;
                 });
+
+            node.attr("height", function(d) {
+                //            console.log("%cthis, this.getBBox()","color:turquoise;font-weight:bold;",this, this.getBBox());
+                //                  d.height = this.getBBox().height;
+                //HERE WE NEED TO SET THE HEIGHT OF THE DOODAD
+                if (!initialisedSizes) {
+                    console.log("%c init", "color:turquoise;font-weight:bold;", initialisedSizes);
+                    d.height = this.getBBox().height;
+                }
+                return this.getBBox().height;
+            })
 
             //this is the box surrounding the binding region. It is not the largest bounding box, because the location variable is offset at the top, as is ct:bind on the bottom;
             bindingborder.attr("x", function(d) {
@@ -135,23 +148,20 @@ function Layout(el) {
                 })
                 .attr("y", function(d) {
                     //  d.y = this.parentNode.getBBox().y;
-                    return d.y - d.height * 1.5;
+                    return d.y + this.nextSibling.getBBox().height/2;
                 })
                 .attr("height", function(d) {
                     //we can't just get the parent bbox size because i grows endlessly bigger with each iteration.
                     //instead, calculate the height based on the two child groups which form the top and bottom of the group
                     var childnodes = this.parentNode.querySelectorAll("g");
                     var h = childnodes[0].getBBox().y - childnodes[1].getBBox().y;
-                    //HERE WE NEED TO SET THE HEIGHT OF THE DOODAD
-                    if (!initialisedSizes) {
-                        console.log("%c init", "color:turquoise;font-weight:bold;", initialisedSizes);
-                        d.height = h;
-                    }
                     return h;
                 }).attr("width", function(d) {
-//                    console.log("%c.parentNode.getBBox().width","color:turquoise;font-weight:bold;",this.parentNode.getBBox());
-//                    d.width = this.parentNode.getBBox().width;
-                    return d.width;
+                    //                    console.log("%c.parentNode.getBBox().width","color:turquoise;font-weight:bold;",this.parentNode.getBBox());
+                    console.log("%cthis","color:turquoise;font-weight:bold;",this.nextSibling.getBBox().width);
+                    d.width = this.nextSibling.getBBox().width + 4*pad;
+                    return this.nextSibling.getBBox().width + 2*pad;
+                    //return d.width;
                 });
 
             uoig.attr("x", function(d) {
@@ -170,7 +180,7 @@ function Layout(el) {
                 })
                 .attr("y", function(d) {
                     var h = this.getBBox().height;
-                    return d.y + h;
+                    return d.y + (h * 3);
                 }).attr("height", "20").attr("width", function(d) {
                     return this.getBBox().width
                 });
@@ -181,7 +191,7 @@ function Layout(el) {
                 })
                 .attr("y", function(d) {
                     var h = this.getBBox().height;
-                    return d.y + (h / 4);
+                    return d.y + (h * 2);
                 }).attr("height", "20").attr("width", function(d) {
                     return this.parentNode.getBBox().width
                 });
@@ -193,8 +203,8 @@ function Layout(el) {
                 })
                 .attr("y", function(d) {
                     var h = this.getBBox().height;
-                    return d.y - h;
-                }).attr("height", 2).attr("width", 20)
+                    return d.y + h;
+                })
 
             locrect.attr("x", function(d, f, g) {
                     return d.x - this.getBBox().width / 2 + pad;
@@ -202,26 +212,26 @@ function Layout(el) {
                 .attr("rx", "10")
                 .attr("ry", "10")
                 .attr("y", function(d) {
-                    var h = this.getBBox().height;
-                    return d.y + -h * 2;
+                    //              var h = this.getBBox().height;
+                    return d.y;
                 }).attr("height", function(d) {
-                    return d.height;
+                    return this.parentNode.getBBox().height;
                 }).attr("width", function(d) {
                     return this.parentNode.getBBox().width;
                 })
 
 
             group.attr("x", function(d) {
-                    return d.bounds.x - pad ;
+                    return d.bounds.x;
                 })
                 .attr("y", function(d) {
-                    return d.bounds.y - (pad*10);
+                    return d.bounds.y;
                 })
                 .attr("width", function(d) {
-                    return d.bounds.width() + (pad* 2);
+                    return d.bounds.width() ;
                 })
                 .attr("height", function(d) {
-                    return d.bounds.height()+ (pad* 10);
+                    return d.bounds.height();
                 });
 
             initialisedSizes = true;
