@@ -1,8 +1,14 @@
 function Layout(el) {
-    this.svg = svg = svg = d3.select(el);
+    this.svg = svg = d3.select(el);
+    this.svgsize = el.getBoundingClientRect()
+    console.log("%cel","color:turquoise;font-weight:bold;",el, this.svgtop);
     try {
-        var width = el.clientWidth,
-            height = el.clientHeight;
+        var width = this.svgsize.height,
+            height = this.svgsize.height;
+            //for ff:
+            el.setAttribute("width", width + "px");
+            el.setAttribute("height",height + "px");
+
         var c = cola.d3adaptor(d3)
             .linkDistance(200)
             .avoidOverlaps(true)
@@ -213,13 +219,10 @@ function Layout(el) {
 
 
             group.attr("x", function(d) {
-              console.log("%cd","color:turquoise;font-weight:bold;",d, this.getBBox());
-
                     return d.bounds.x + pad;
-
                 })
                 .attr("y", function(d) {
-                    return d.bounds.y;
+                    return d.bounds.y + 30;
                 })
                 .attr("width", function(d) {
                     return d.bounds.width() - pad;
