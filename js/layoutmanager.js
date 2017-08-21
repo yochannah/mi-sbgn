@@ -63,24 +63,17 @@ function Layout(el) {
             });
 
 
-        var label = svg.selectAll(".label")
-            .data(graphView.graph.nodes)
-            .enter().append("text")
-            .attr("class", function(d) {
-                if (d.constructor.name == "Label") {
-                    return "label";
-                } else {
-                    return "node";
-                }
-            })
+        var binding = svg.selectAll(".BindingSite");
+        var bindingborder = binding.append("rect").attr("class", "bindingborder");
+
+
+        var labeltext = node.append("text")
             .text(function(d) {
                 return d.name;
             })
             .call(c.drag);
 
-
-
-        var rect = node.selectAll(".Node").append("rect")
+        var rect = node.selectAll(".Node").append("text")
             .attr("width", function(d) {
                 return d.width - 2 * pad;
             })
@@ -92,6 +85,7 @@ function Layout(el) {
                 c.alpha(1); // fire it off again to satify gridify
             });
 
+
         var link = svg.selectAll(".link")
             .data(graphView.graph.links)
             .enter().append("line")
@@ -99,24 +93,20 @@ function Layout(el) {
             .attr("marker-start", "url(#Upside-down-harpoon)")
             .attr("marker-end", "url(#Harpoon)").call(c.drag);
 
-        var binding =
-            svg.selectAll(".BindingSite")
-            .append("g");
-        var bindingborder = binding.append("rect");
 
 
         //uois - e.g ct:bind
-        var uoig = binding.append("g").attr("class", "uoig");
+        var uoig = binding.append("g").attr("class", "uoigroup");
         var uoirect = uoig.append("rect");
-        var uoitext = uoig.attr("class", "uoi")
-            .append("text")
+        var uoitext = uoig
+            .append("text").attr("class", "uoitext")
             .text(function(d) {
                 return d.uoi.info;
             })
             .call(c.drag);
 
         // location variable
-        var locg = binding.append("g");
+        var locg = binding.append("g").attr("class", "locationgroup");
         var locrect = locg.append("rect");
         var locationOfBinding =
             locg.append("text")
@@ -126,7 +116,9 @@ function Layout(el) {
             })
             .call(c.drag);
 
-        c.on("tick", function() {
+        var initialisedSizes = false;
+
+        c.on("tick", function(x, y, z) {
             link.attr("x1", function(d) {
                     return d.source.x;
                 })
@@ -140,7 +132,7 @@ function Layout(el) {
                     return d.target.y;
                 });
 
-            label.attr("x", function(d) {
+            labeltext.attr("x", function(d) {
                     d.height = this.getBBox().height;
                     d.width = this.getBBox().width;
                     return d.x - d.width / 2 + pad;
@@ -150,21 +142,29 @@ function Layout(el) {
                     return d.y + h / 4 - pad;
                 });
 
+            //this is the box surrounding the binding region. It is not the largest bounding box, because the location variable is offset at the top, as is ct:bind on the bottom;
             bindingborder.attr("x", function(d) {
                     return d.x - this.getBBox().width / 2;
                 })
                 .attr("y", function(d) {
-                    return d.y - d.height*1.5;
-                }).attr("height", function(d) {
-                  //we can't just get the parent bbox size because i grows endlessly bigger with each iteration.
-                  //instead, calculate the height based on the two child groups which formthe top and bottom of the group
-                  var childnodes = this.parentNode.querySelectorAll("g");
+                    //  d.y = this.parentNode.getBBox().y;
+                    return d.y - d.height * 1.5;
+                })
+                .attr("height", function(d) {
+                    //we can't just get the parent bbox size because i grows endlessly bigger with each iteration.
+                    //instead, calculate the height based on the two child groups which form the top and bottom of the group
+                    var childnodes = this.parentNode.querySelectorAll("g");
                     var h = childnodes[0].getBBox().y - childnodes[1].getBBox().y;
                     //HERE WE NEED TO SET THE HEIGHT OF THE DOODAD
+                    if (!initialisedSizes) {
+                        console.log("%c init", "color:turquoise;font-weight:bold;", initialisedSizes);
+                        d.height = h;
+                    }
                     return h;
                 }).attr("width", function(d) {
-                    d.width = this.parentNode.getBBox().width;
-                    return this.parentNode.getBBox().width;
+//                    console.log("%c.parentNode.getBBox().width","color:turquoise;font-weight:bold;",this.parentNode.getBBox());
+//                    d.width = this.parentNode.getBBox().width;
+                    return d.width;
                 });
 
             uoig.attr("x", function(d) {
@@ -252,7 +252,7 @@ function Layout(el) {
                     return d.bounds.height();
                 });
 
-
+            initialisedSizes = true;
         });
     } catch (e) {
         console.log("%ce", "color:cornflowerblue;font-family:sans-serif;", e);
