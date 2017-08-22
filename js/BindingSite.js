@@ -14,14 +14,14 @@ function BindingSite(model, count) {
 
 
 
-BindingSite.prototype.getCenter = function() {
-  var bb = this.node.getBBox(),
-  center = {
-    x : (bb.x + (bb.width/2)),
-    y : (bb.y + (bb.height/2))
-  },
-  convert = Maths.makeAbsoluteContext(this.node);
-  return convert(center.x, center.y);
+BindingSite.prototype.getCenterX = function() {
+  var bb = this.node.getBBox();
+  return bb.x + bb.width/2;
+}
+
+BindingSite.prototype.getCenterY = function() {
+  var bb = this.node.getBBox();
+  return bb.y + bb.height/2;
 }
 
 BindingSite.prototype.getRealBBox = function() {

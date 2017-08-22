@@ -1,13 +1,12 @@
 function Layout(el) {
     this.svg = svg = d3.select(el);
     this.svgsize = el.getBoundingClientRect()
-    console.log("%cel","color:turquoise;font-weight:bold;",el, this.svgtop);
     try {
         var width = this.svgsize.height,
             height = this.svgsize.height;
-            //for ff:
-            el.setAttribute("width", width + "px");
-            el.setAttribute("height",height + "px");
+        //for ff:
+        el.setAttribute("width", width + "px");
+        el.setAttribute("height", height + "px");
 
         var c = cola.d3adaptor(d3)
             .linkDistance(200)
@@ -24,8 +23,6 @@ function Layout(el) {
             .links(graphView.graph.links)
             .groups(graphView.graph.groups);
         c.start();
-
-        console.log("%cc", "color:turquoise;font-weight:bold;", c);
 
         svg.append("defs").append("marker")
             .attr("id", "Harpoon")
@@ -63,6 +60,7 @@ function Layout(el) {
             .data(graphView.graph.nodes)
             .enter().append("g")
             .attr("class", function(d) {
+                d.node = this;
                 return "node " + d.constructor.name + " " + d.cid;
             })
             .call(c.drag)
@@ -108,33 +106,40 @@ function Layout(el) {
             locg.append("text")
             .attr("class", "position")
             .text(function(d) {
-                return d.position.info;
+                return " " + d.position.info;
             })
             .call(c.drag);
 
         var initialisedSizes = false;
 
         c.on("tick", function(x, y, z) {
-              //  debugger;
+            //  debugger;
             link.attr("x1", function(d) {
-                    return d.source.x;
+                    return d.source.getCenterX();
                 })
                 .attr("y1", function(d) {
-                    return d.source.y;
+                    return d.source.getCenterY();
                 })
                 .attr("x2", function(d) {
-                    return d.target.x;
+                    return d.target.getCenterX();
                 })
                 .attr("y2", function(d) {
-                    return d.target.y;
+                    return d.target.getCenterY();
                 });
 
             labeltext.attr("x", function(d) {
-                    return d.x - d.width / 2 + pad *2;
+                    return d.x - d.width / 2 + pad * 2;
                 })
                 .attr("y", function(d) {
                     var h = this.getBBox().height;
                     return d.y + h * 2;
+                })
+                .attr("width", function(d) {
+                        var w = this.getBBox().width;
+                        if (d.constructor.name == "Label") {
+                            d.width = w;
+                        }
+                    return w;
                 });
 
             node.attr("height", function(d) {
@@ -148,7 +153,7 @@ function Layout(el) {
                 })
                 .attr("y", function(d) {
                     //  d.y = this.parentNode.getBBox().y;
-                    return d.y + this.nextSibling.getBBox().height/2;
+                    return d.y + this.nextSibling.getBBox().height / 2;
                 })
                 .attr("height", function(d) {
                     //we can't just get the parent bbox size because i grows endlessly bigger with each iteration.
@@ -157,12 +162,12 @@ function Layout(el) {
                     var h = childnodes[0].getBBox().y - childnodes[1].getBBox().y;
                     return h;
                 }).attr("width", function(d) {
-                    d.width = this.nextSibling.getBBox().width + 4*pad;
-                    return this.nextSibling.getBBox().width + 2*pad;
+                    d.width = this.nextSibling.getBBox().width + 4 * pad;
+                    return this.nextSibling.getBBox().width + 2 * pad;
                 });
 
             uoig.attr("x", function(d) {
-                    return d.x - this.getBBox().width / 2 + 2*pad;
+                    return d.x - this.getBBox().width / 2 + 2 * pad;
                 })
                 .attr("y", function(d) {
                     var h = this.getBBox().height;
@@ -222,6 +227,7 @@ function Layout(el) {
                     return d.bounds.x + pad;
                 })
                 .attr("y", function(d) {
+                    //TODO: Figure out why the group is offset incorrectly when everything else is ok (the +30)
                     return d.bounds.y + 30;
                 })
                 .attr("width", function(d) {
