@@ -3,7 +3,8 @@ function Layout(el) {
     this.svgsize = el.getBoundingClientRect()
     try {
         var width = this.svgsize.height,
-            height = this.svgsize.height;
+            height = this.svgsize.height,
+            pad = styles.padding;
         //for ff, which will display offscreen without height/width set:
         el.setAttribute("width", width + "px");
         el.setAttribute("height", height + "px");
@@ -35,9 +36,8 @@ function Layout(el) {
 
         //give all nodes some default sizes to start the layout with
         graphView.graph.nodes.forEach(function(node) {
-          node.height = 21;
-          node.width = 31;
-          node.padding = 14;
+          node.height = 41;
+          node.width = 41;
         })
 
         //Setting up cola
@@ -55,7 +55,6 @@ function Layout(el) {
         c.start();
 
 
-
         var group = svg.selectAll(".group interactor")
             .data(graphView.graph.groups)
             .enter().append("rect")
@@ -63,7 +62,6 @@ function Layout(el) {
             .attr("class", "interactor")
             .call(c.drag);
 
-        var pad = styles.padding;
 
         var node = svg.selectAll(".node")
             .data(graphView.graph.nodes)
@@ -148,7 +146,7 @@ function Layout(el) {
                         if (d.constructor.name == "Label") {
                             d.width = w;
                         }
-                    return w;
+                    return w + pad*2;
                 });
 
             node.attr("height", function(d) {

@@ -1,8 +1,6 @@
 function BindingSite(model, count) {
     this.model = model;
-    this.count = count + 1;
     this.name = "binding region";
-    this.class = "bindingregion";
     this.cid = this.model.cid;
 
     graphView.addNode(this);
@@ -11,8 +9,6 @@ function BindingSite(model, count) {
     this.position = new StateVariable(model.get("pos"));
     return this;
 }
-
-
 
 BindingSite.prototype.getCenterX = function() {
   var bb = this.node.getBBox();
@@ -35,7 +31,7 @@ BindingSite.prototype.addLinks = function() {
           graphView.addLink(parent.model.cid, region.cid);
       });
     } else {
-      console.error("%c somethign went wrong with the link for","color:orange;",this);
+      console.error("%c something went wrong with the link for","color:orange;",this);
     }
   });
 }
