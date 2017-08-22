@@ -4,26 +4,12 @@ function Layout(el) {
     try {
         var width = this.svgsize.height,
             height = this.svgsize.height;
-        //for ff:
+        //for ff, which will display offscreen without height/width set:
         el.setAttribute("width", width + "px");
         el.setAttribute("height", height + "px");
 
-        var c = cola.d3adaptor(d3)
-            .linkDistance(200)
-            .avoidOverlaps(true)
-            .handleDisconnected(true)
-            .size([width, height]);
-        graphView.graph.nodes.forEach(function(node) {
-            node.height = 21;
-            node.width = 31;
-            node.padding = 14;
-        })
-
-        c.nodes(graphView.graph.nodes)
-            .links(graphView.graph.links)
-            .groups(graphView.graph.groups);
-        c.start();
-
+        // Define the harpoon arrow markers, which
+        // are required for sbgn relationships.
         svg.append("defs").append("marker")
             .attr("id", "Harpoon")
             .attr("viewbox", "0 0 20 20")
@@ -45,6 +31,29 @@ function Layout(el) {
             .attr("orient", "auto")
             .append("path")
             .attr("d", "M 0,20 40,40 20,20 40,0 Z");
+
+
+        //give all nodes some default sizes to start the layout with
+        graphView.graph.nodes.forEach(function(node) {
+          node.height = 21;
+          node.width = 31;
+          node.padding = 14;
+        })
+
+        //Setting up cola
+        var c = cola.d3adaptor(d3)
+            .linkDistance(200)
+            .avoidOverlaps(true)
+            .handleDisconnected(true)
+            .size([width, height]);
+
+        //give cola some nodes, links, and groups,
+        //then start laying out
+        c.nodes(graphView.graph.nodes)
+            .links(graphView.graph.links)
+            .groups(graphView.graph.groups);
+        c.start();
+
 
 
         var group = svg.selectAll(".group interactor")

@@ -24,18 +24,6 @@ BindingSite.prototype.getCenterY = function() {
   return bb.y + bb.height/2;
 }
 
-BindingSite.prototype.getRealBBox = function() {
-  var bb = this.node.getBBox(),
-  realBB = {width : bb.width, height: bb.height},
-  convert = Maths.makeAbsoluteContext(this.node),
-  bbxy = convert(bb.x, bb.y);
-
-  realBB.x = bbxy.x;
-  realBB.y = bbxy.y;
-  realBB.center = this.getCenter();
-  return realBB;
-}
-
 BindingSite.prototype.addLinks = function() {
   //find links and add them.
   var links = this.model.get("feature").get("linkedFeatures"),
@@ -47,7 +35,7 @@ BindingSite.prototype.addLinks = function() {
           graphView.addLink(parent.model.cid, region.cid);
       });
     } else {
-      console.log("%cthis","color:turquoise;font-weight:bold;",this);
+      console.error("%c somethign went wrong with the link for","color:orange;",this);
     }
   });
 }
