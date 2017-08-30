@@ -33,7 +33,6 @@ function Layout(el) {
             .append("path")
             .attr("d", "M 0,20 40,40 20,20 40,0 Z");
 
-
         //give all nodes some default sizes to start the layout with
         graphView.graph.nodes.forEach(function(node) {
           node.height = 41;
@@ -122,16 +121,16 @@ function Layout(el) {
         c.on("tick", function(x, y, z) {
             //  debugger;
             link.attr("x1", function(d) {
-                    return d.source.getCenterX();
+                    return d.source.getArrowTarget(d, this, "1").x;
                 })
                 .attr("y1", function(d) {
-                    return d.source.getCenterY();
+                    return d.source.getArrowTarget(d, this, "1").y;
                 })
                 .attr("x2", function(d) {
-                    return d.target.getCenterX();
+                    return d.target.getArrowTarget(d, this, "2").x;
                 })
                 .attr("y2", function(d) {
-                    return d.target.getCenterY();
+                    return d.target.getArrowTarget(d, this, "2").y;
                 });
 
             labeltext.attr("x", function(d) {

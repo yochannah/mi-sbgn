@@ -20,6 +20,12 @@ BindingSite.prototype.getCenterY = function() {
   return bb.y + bb.height/2;
 }
 
+BindingSite.prototype.getArrowTarget = function(line, previousLine, prevlinecoord) {
+//  console.log("%cline","color:turquoise;font-weight:bold;",line, r);
+//console.log("%cpreviousLine","border-bottom:chartreuse solid 3px;",previousLine);
+return Maths.boxLineIntersection(this,line, previousLine, prevlinecoord);
+}
+
 BindingSite.prototype.addLinks = function() {
   //find links and add them.
   var links = this.model.get("feature").get("linkedFeatures"),
