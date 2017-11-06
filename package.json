@@ -1,0 +1,27 @@
+{
+  "name": "mi-sbgn",
+  "version": "1.0.0",
+  "description": "Library to convert protein complexes from JSON to SBGN-ML",
+  "main": "index.js",
+  "dependencies": {
+    "webcola": "^3.3.5",
+    "mi-model": "^0.5.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yochannah/mi-sbgn.git"
+  },
+  "keywords": [
+    "mi-sbgn"
+  ],
+  "author": "Yo Yehudi",
+  "license": "LGPL-2.1",
+  "bugs": {
+    "url": "https://github.com/yochannah/mi-sbgn/issues"
+  },
+  "homepage": "https://github.com/yochannah/mi-sbgn#readme"
+}
