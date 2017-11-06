@@ -38,7 +38,7 @@ document.getElementById("complexSelector").addEventListener("change", function(e
 function initViewer(complexName) {
 $.get({
     dataType: "json",
-    url: "http://www.ebi.ac.uk/intact/complex-ws/export/" + complexName
+    url: "https://www.ebi.ac.uk/intact/complex-ws/export/" + complexName
 }, function(data) {
     new MIModel(data).load().then(function(model) {
       complexViewer = new ComplexView({
