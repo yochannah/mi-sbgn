@@ -28,6 +28,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
 //  initViewer("EBI-8869931");
 });
 
+var generateXMLButtons = document.querySelectorAll(".download-sbgn");
+for (var i = 0; i < generateXMLButtons.length; i++) {
+    var XMLButton = generateXMLButtons.item(i);
+    XMLButton.addEventListener("click", function (event) {
+        generateXML();
+    });
+}
+
 ////// Selector for complexes:
 document.getElementById("complexSelector").addEventListener("change", function(event) {
   complexViewer.empty();
@@ -53,3 +61,8 @@ $.get({
     });
 
 };
+
+function generateXML() {
+    console.log(complexViewer, complexViewer.toXML())
+    
+}

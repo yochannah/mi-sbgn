@@ -3,18 +3,36 @@ function Participant(model) {
     return this;
 }
 
-Participant.prototype.setLocation = function(x, y) {
+Participant.prototype.setLocation = function (x, y) {
     setAttr(this.node, "transform", "translate(" + Math.round(x) + "," + Math.round(y) + ")");
 }
 
-Participant.prototype.addGroup = function() {
+Participant.prototype.addGroup = function () {
     var groupMembers = this.bindingSites.concat(this.label);
     graphView.addGroup(groupMembers, this.model.cid);
 }
 
-Participant.prototype.init = function(model) {
+
+Participant.prototype.toXML = function () {
+    var parent = this;
+    return jstoxml.toXML({
+        _name: 'glyph',
+        _attrs: {
+            id: parent.model.cid,
+            class: "entity"
+        },
+        _content: {
+            _content: function () {
+                return ""
+            }
+        }
+    });
+
+}
+
+Participant.prototype.init = function (model) {
     this.model = model;
-    this.node={};
+    this.node = {};
     this.interactor = this.model.get("interactor");
     this.initFeatures();
     this.initBindingSites();
@@ -27,32 +45,14 @@ Participant.prototype.init = function(model) {
     if (this.bindingSites) {
         var parent = this;
         parent.node.bindingSites = [];
-        this.bindingSites.map(function(site, i) {
+        this.bindingSites.map(function (site, i) {
             var newSite = new BindingSite(site, i);
             parent.node.bindingSites.push(newSite);
         });
     }
 }
 
-Participant.prototype.updateOutlines = function() {
-
-    //update binding sites and uois
-    this.node.bindingSites.map(function(site) {
-        site.updateOutlines();
-    });
-
-    var bb = this.node.getBBox();
-
-    setAttr(this.node.rect, "x", (bb.x - styles.padding));
-    setAttr(this.node.rect, "y", (bb.y - styles.padding));
-    setAttr(this.node.rect, "width", (bb.width + (styles.padding * 2)));
-    setAttr(this.node.rect, "height", (bb.height + (styles.padding * 2)));
-
-    this.node.appendChild(this.node.uoi.node);
-    this.node.uoi.updateOutlines(this.node.rect.getBBox());
-}
-
-Participant.prototype.initFeatures = function() {
+Participant.prototype.initFeatures = function () {
     this.features = this.model.get("features");
     if (this.features.length > 0) {
         this.features = this.features.models;
@@ -62,7 +62,7 @@ Participant.prototype.initFeatures = function() {
     if (this.features) {
         this.links = [];
         var links = [];
-        this.features.map(function(feature) {
+        this.features.map(function (feature) {
             var id1 = parseInt(feature.get("linkedFeatures").models[0].get("id"), 10);
             var id2 = parseInt(feature.get("id"), 10);
             links = links.concat(feature.get("linkedFeatures").models);
@@ -70,10 +70,10 @@ Participant.prototype.initFeatures = function() {
     }
 }
 
-Participant.prototype.initBindingSites = function() {
+Participant.prototype.initBindingSites = function () {
     var binding = [];
     if (this.features) {
-        this.features.map(function(feature) {
+        this.features.map(function (feature) {
             var seq = feature.get("sequenceData").models;
             if (seq) {
                 binding = binding.concat(seq);
