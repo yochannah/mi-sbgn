@@ -41,3 +41,7 @@ BindingSite.prototype.addLinks = function() {
     }
   });
 }
+
+BindingSite.prototype.toXML = function() {
+  return "<bbbb>";
+}

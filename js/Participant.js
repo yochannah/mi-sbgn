@@ -9,17 +9,36 @@ Participant.prototype.addGroup = function () {
 }
 
 Participant.prototype.getBounds = function () {
-    var parent = this;
-    return {
-        y: parent.group.bounds.y,
-        x: parent.group.bounds.x,
-        w: parent.group.bounds.X - parent.group.bounds.x,
-        h: parent.group.bounds.Y - parent.group.bounds.y        
-    }
+    return graphView.boundsToSBGNCoords(this.group.bounds);
+}
+
+Participant.prototype.generateBindingSiteXML = function () {
+    var sites = [];
+
+    this.node.bindingSites.map(function (bindingSite) {
+        sites.push(bindingSite.toXML());
+    });
+    return sites;
 }
 
 Participant.prototype.toXML = function () {
-    var parent = this;
+    var parent = this,
+        bindingSiteXML = parent.generateBindingSiteXML(),
+        participantXML = [{
+                _name: "label",
+                //**This is what I WISH I could do: specify label location. but apparently that's invalid sbgn-ml.  
+                // _attrs: $.fn.extend({
+                //     "text": parent.label.name
+                // },graphView.boundsToSBGNCoords(parent.label.bounds))
+                _attrs: {
+                    "text": parent.label.name
+                },
+            },
+            {
+                _name: "bbox",
+                _attrs: parent.getBounds()
+            }
+        ]
 
     return jstoxml.toXML({
         _name: 'glyph',
@@ -27,19 +46,7 @@ Participant.prototype.toXML = function () {
             id: parent.model.cid,
             class: "entity"
         },
-        _content: [
-            {
-            _name: "label",
-            _attrs: {
-                "text": parent.label.name
-            }
-        },
-        {
-            _name: "bbox",
-            _attrs : parent.getBounds()
-        }
-
-    ]
+        _content: bindingSiteXML.concat(participantXML)
 
     });
 }

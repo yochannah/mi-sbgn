@@ -12,6 +12,7 @@ function Graph() {
         // runs based on index of nodes rather than ids.
         this.graph.nodeIndexLookup[node.model.cid] = this.graph.nodes.length;
         this.graph.nodes.push(node);
+        return node;
     };
     this.addLinkIndex = function(link1, link2) {
         if (this.graph.linkDeduplicationLookup[link1]) {
@@ -76,5 +77,13 @@ function Graph() {
         this.graph.nodes.map(function(aNode) {
             aNode.addLinks();
         });
+    }
+    this.boundsToSBGNCoords = function(someNodeBounds) {
+        return {
+            y: someNodeBounds.y,
+            x: someNodeBounds.x,
+            w: someNodeBounds.X - someNodeBounds.x,
+            h: someNodeBounds.Y - someNodeBounds.y
+        }
     }
 }
