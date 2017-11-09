@@ -69,6 +69,7 @@ function Graph() {
             g.leaves.push(parent.graph.nodeIndexLookup[identifier]);
         });
         this.graph.groups.push(g);
+        return g;
     };
     this.addLinks = function() {
         //Adds all links for nodes. This needs to be run after all nodes have been created.

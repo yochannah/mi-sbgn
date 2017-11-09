@@ -3,31 +3,45 @@ function Participant(model) {
     return this;
 }
 
-Participant.prototype.setLocation = function (x, y) {
-    setAttr(this.node, "transform", "translate(" + Math.round(x) + "," + Math.round(y) + ")");
-}
-
 Participant.prototype.addGroup = function () {
     var groupMembers = this.bindingSites.concat(this.label);
-    graphView.addGroup(groupMembers, this.model.cid);
+    this.group = graphView.addGroup(groupMembers, this.model.cid);
 }
 
+Participant.prototype.getBounds = function () {
+    var parent = this;
+    return {
+        y: parent.group.bounds.y,
+        x: parent.group.bounds.x,
+        w: parent.group.bounds.X - parent.group.bounds.x,
+        h: parent.group.bounds.Y - parent.group.bounds.y        
+    }
+}
 
 Participant.prototype.toXML = function () {
     var parent = this;
+
     return jstoxml.toXML({
         _name: 'glyph',
         _attrs: {
             id: parent.model.cid,
             class: "entity"
         },
-        _content: {
-            _content: function () {
-                return ""
+        _content: [
+            {
+            _name: "label",
+            _attrs: {
+                "text": parent.label.name
             }
+        },
+        {
+            _name: "bbox",
+            _attrs : parent.getBounds()
         }
-    });
 
+    ]
+
+    });
 }
 
 Participant.prototype.init = function (model) {
@@ -38,6 +52,7 @@ Participant.prototype.init = function (model) {
     this.initBindingSites();
 
     this.label = new Label(this.interactor.get("label"), this.interactor.cid);
+    this.node.p = graphView;
     graphView.addNode(this.label, this.interactor.cid);
 
     this.node.uoi = new UnitOfInformation(this.interactor.get("type").name);
