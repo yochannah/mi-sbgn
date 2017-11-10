@@ -47,7 +47,7 @@ Participant.prototype.toXML = function () {
             id: parent.model.cid,
             class: "entity"
         },
-        _content: bindingSiteXML.concat(participantXML)
+        _content: participantXML.concat(bindingSiteXML)
 
     });
 }

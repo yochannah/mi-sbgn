@@ -98,12 +98,18 @@ function Layout(el) {
         //uois - e.g ct:bind
         var uoig = binding.append("g").attr("class", "uoigroup");
         var uoirect = uoig.append("rect");
+        uoirect.attr("id", function (d) {
+            console.log(d, this);
+            d.uoi.rect = this;
+            return d.cid + "-uoi";
+        });
         var uoitext = uoig
             .append("text").attr("class", "uoitext")
             .text(function(d) {
                 return d.uoi.info;
             })
             .call(c.drag);
+        console.log(uoirect)
 
         // location variable
         var locg = binding.append("g").attr("class", "locationgroup");
