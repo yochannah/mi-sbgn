@@ -3,7 +3,6 @@ function UnitOfInformation(info) {
 }
 UnitOfInformation.prototype.toXML = function(){
     var parent = this;
-    console.log(parent.rect.y, parent.rect);
     return jstoxml.toXML({
         _name: 'glyph',
         _attrs: {
@@ -18,7 +17,8 @@ UnitOfInformation.prototype.toXML = function(){
         },
         {
             _name: "bbox",
-            _attrs: {y: parent.rect.y.baseVal.value,
+            _attrs: {
+                y: (parent.rect.y.baseVal.value - parent.rect.height.baseVal.value),
                 x: parent.rect.x.baseVal.value, 
                 w: parent.rect.width.baseVal.value,
                 h: parent.rect.height.baseVal.value}

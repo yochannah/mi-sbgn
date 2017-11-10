@@ -59,7 +59,7 @@ BindingSite.prototype.toXML = function () {
         _attrs: graphView.boundsToSBGNCoords(parent.bounds)
       },
       parent.uoi.toXML(),
-      parent.position.toXML()
+      parent.position.toXML(parent.bounds.y)
     ]
 
   });

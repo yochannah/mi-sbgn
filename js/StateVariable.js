@@ -20,9 +20,8 @@ function StateVariable(info) {
     this.node.appendChild(text);
 }
 
-StateVariable.prototype.toXML = function(){
+StateVariable.prototype.toXML = function(parentTop){
     var parent = this;
-    console.log(parent.rect.y, parent.rect);
     return jstoxml.toXML({
         _name: 'glyph',
         _attrs: {
@@ -38,7 +37,10 @@ StateVariable.prototype.toXML = function(){
         {
             _name: "bbox",
             _attrs: {
-                y: parent.rect.y.baseVal.value.toFixed(0),
+                //using the parent.rect.y throws this massively off in Vanted viewer. 
+                //Not sure if it's the fault of this code or vanted, but using
+                //the parent element's y coord seems to fix it.
+                y: parentTop,
                 x: parent.rect.x.baseVal.value.toFixed(0),
                 w: parent.rect.width.baseVal.value.toFixed(0),
                 h: parent.rect.height.baseVal.value.toFixed(0)

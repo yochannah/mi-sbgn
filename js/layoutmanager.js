@@ -99,7 +99,6 @@ function Layout(el) {
         var uoig = binding.append("g").attr("class", "uoigroup");
         var uoirect = uoig.append("rect");
         uoirect.attr("id", function (d) {
-            console.log(d, this);
             d.uoi.rect = this;
             return d.cid + "-uoi";
         });
@@ -109,13 +108,11 @@ function Layout(el) {
                 return d.uoi.info;
             })
             .call(c.drag);
-        console.log(uoirect)
 
         // location variable
         var locg = binding.append("g").attr("class", "locationgroup");
         var locrect = locg.append("rect");
         locrect.attr("id", function (d) {
-            console.log(d, this);
             d.position.rect = this;
             return d.cid + "-position";
         });
@@ -231,7 +228,6 @@ function Layout(el) {
                 .attr("rx", "10")
                 .attr("ry", "10")
                 .attr("y", function(d) {
-                    //              var h = this.getBBox().height;
                     return d.y;
                 }).attr("height", function(d) {
                     return this.parentNode.getBBox().height;

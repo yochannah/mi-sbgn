@@ -80,7 +80,7 @@ function Graph() {
     }
     this.boundsToSBGNCoords = function(someNodeBounds) {
         return {
-            y: someNodeBounds.y.toFixed(0),
+            y: someNodeBounds.y.toFixed(0), //I don't know why but this is so goshdarned wrong.
             x: someNodeBounds.x.toFixed(0),
             w: (someNodeBounds.X - someNodeBounds.x).toFixed(0),
             h: (someNodeBounds.Y - someNodeBounds.y).toFixed(0)
