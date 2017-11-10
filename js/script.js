@@ -9,7 +9,8 @@ var styles = {
         protein: "mt:prot",
         binding: "ct:bind"
     },
-    svgElementId = "mi-sbgn";
+    svgElementId = "mi-sbgn",
+    currentComplex = "EBI-9997373";
 
 //This is syntactic sugar and is used across all the svg element files as a common util.
 var setAttr = function(elem, x, y) {
@@ -23,7 +24,7 @@ var setAttr = function(elem, x, y) {
 
 document.addEventListener("DOMContentLoaded", function(event) {
 //  initViewer("EBI-10828997");
-  initViewer("EBI-9997373");
+  initViewer(currentComplex);
 //  initViewer("EBI-9008420");
 //  initViewer("EBI-8869931");
 });
@@ -44,6 +45,7 @@ document.getElementById("complexSelector").addEventListener("change", function(e
 });
 
 function initViewer(complexName) {
+    currentComplex = complexName;
 $.get({
     dataType: "json",
     url: "https://www.ebi.ac.uk/intact/complex-ws/export/" + complexName
@@ -63,6 +65,7 @@ $.get({
 };
 
 function generateXML() {
-    console.log(complexViewer, complexViewer.toXML())
-    
+    var complexXML = complexViewer.toXML();
+    console.log(complexViewer, complexXML);
+    downloadFile(complexXML,"xml", currentComplex);
 }

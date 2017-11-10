@@ -23,6 +23,7 @@ Participant.prototype.generateBindingSiteXML = function () {
 
 Participant.prototype.toXML = function () {
     var parent = this,
+        //build array of xml tags up
         bindingSiteXML = parent.generateBindingSiteXML(),
         participantXML = [{
                 _name: "label",
@@ -39,7 +40,7 @@ Participant.prototype.toXML = function () {
                 _attrs: parent.getBounds()
             }
         ]
-
+    // combine xml and send it to parent function
     return jstoxml.toXML({
         _name: 'glyph',
         _attrs: {
