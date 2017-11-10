@@ -114,6 +114,11 @@ function Layout(el) {
         // location variable
         var locg = binding.append("g").attr("class", "locationgroup");
         var locrect = locg.append("rect");
+        locrect.attr("id", function (d) {
+            console.log(d, this);
+            d.position.rect = this;
+            return d.cid + "-position";
+        });
         var locationOfBinding =
             locg.append("text")
             .attr("class", "position")

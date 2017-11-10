@@ -66,6 +66,5 @@ $.get({
 
 function generateXML() {
     var complexXML = complexViewer.toXML();
-    console.log(complexViewer, complexXML);
     downloadFile(complexXML,"xml", currentComplex);
 }

@@ -19,3 +19,33 @@ function StateVariable(info) {
     setAttr(text, "font-size", styles.textSize);
     this.node.appendChild(text);
 }
+
+StateVariable.prototype.toXML = function(){
+    var parent = this;
+    console.log(parent.rect.y, parent.rect);
+    return jstoxml.toXML({
+        _name: 'glyph',
+        _attrs: {
+            id: parent.rect.id,
+            class: "state variable"
+        },
+        _content: [{
+            _name: "state",
+            _attrs: {
+                "value": parent.info
+            }
+        },
+        {
+            _name: "bbox",
+            _attrs: {
+                y: parent.rect.y.baseVal.value.toFixed(0),
+                x: parent.rect.x.baseVal.value.toFixed(0),
+                w: parent.rect.width.baseVal.value.toFixed(0),
+                h: parent.rect.height.baseVal.value.toFixed(0)
+            }
+        }
+        ]
+
+    });;
+
+}

@@ -42,7 +42,6 @@ BindingSite.prototype.addLinks = function () {
 
 BindingSite.prototype.toXML = function () {
   var parent = this;
-  console.log(parent);
   return jstoxml.toXML({
     _name: 'glyph',
     _attrs: {
@@ -59,7 +58,8 @@ BindingSite.prototype.toXML = function () {
         _name: "bbox",
         _attrs: graphView.boundsToSBGNCoords(parent.bounds)
       },
-      parent.uoi.toXML()
+      parent.uoi.toXML(),
+      parent.position.toXML()
     ]
 
   });

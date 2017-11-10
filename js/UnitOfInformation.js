@@ -24,6 +24,5 @@ UnitOfInformation.prototype.toXML = function(){
                 h: parent.rect.height.baseVal.value}
         }
         ]
-
-    });;
+    });
 }

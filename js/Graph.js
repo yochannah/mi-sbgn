@@ -80,10 +80,10 @@ function Graph() {
     }
     this.boundsToSBGNCoords = function(someNodeBounds) {
         return {
-            y: someNodeBounds.y,
-            x: someNodeBounds.x,
-            w: someNodeBounds.X - someNodeBounds.x,
-            h: someNodeBounds.Y - someNodeBounds.y
+            y: someNodeBounds.y.toFixed(0),
+            x: someNodeBounds.x.toFixed(0),
+            w: (someNodeBounds.X - someNodeBounds.x).toFixed(0),
+            h: (someNodeBounds.Y - someNodeBounds.y).toFixed(0)
         }
     }
 }
