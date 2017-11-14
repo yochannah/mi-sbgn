@@ -11,32 +11,6 @@ var ComplexView = Backbone.View.extend({
         this.$el.html("");
         this.node = null;
     },
-    toXML: function () {
-        var parent = this;
-        return jstoxml.toXML({
-            _name: 'sbgn',
-            _content: {
-                _attrs: {
-                    language: "entity relationship"
-                },
-                _content: function () {
-                    var participantXML = [];
-
-                    parent.participants.map(function (participant) {
-                        participantXML.push(participant.toXML());
-                    });
-
-                    return participantXML;
-                },
-                _name: "map"
-            },
-            _attrs: {
-                xmlns: 'http://sbgn.org/libsbgn/0.2'
-            }
-        }, {
-            header: true
-        });
-    },
     render: function () {
 
         try {
@@ -51,24 +25,55 @@ var ComplexView = Backbone.View.extend({
         }
         return this;
     },
-
-    renderLinks: function () {
-        this.links = [];
-        var parent = this;
-        graphView.graph.links.map(function (link) {
-            var l = new Link(link).node;
-            parent.links.push(l);
-        });
-    },
     instantiateParticipants: function () {
         var parent = this;
         this.model.get("interactions").at(0).get("participants").map(function (participant) {
             var newParticipant = new Participant(participant);
             parent.participants.push(newParticipant);
-            //  graphView.addNode(newParticipant);
         });
         this.participants.map(function (participant) {
             participant.addGroup();
         });
+    },
+    generateParticipantXML: function () {
+        var parent = this,
+        participantXML = [];
+
+        parent.participants.map(function (participant) {
+            participantXML.push(participant.toXML());
+        });
+
+        return participantXML;
+
+    },
+    generateLinkXML: function () {
+        var parent = this,
+        linkXML = [];
+        graphView.graph.links.map(function (link) {
+            linkXML.push(link.toXML());
+        });
+
+        return linkXML;
+
+    },
+    toXML: function () {
+        var participantXML = this.generateParticipantXML(),
+            linkXML = this.generateLinkXML();
+        return jstoxml.toXML({
+            _name: 'sbgn',
+            _content: {
+                _attrs: {
+                    language: "entity relationship"
+                },
+                _content: participantXML.concat(linkXML),
+                _name: "map"
+            },
+            _attrs: {
+                xmlns: 'http://sbgn.org/libsbgn/0.2'
+            }
+        }, {
+            header: true
+        });
     }
+
 });

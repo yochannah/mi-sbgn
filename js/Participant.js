@@ -39,7 +39,7 @@ Participant.prototype.toXML = function () {
                 _name: "bbox",
                 _attrs: parent.getBounds()
             }
-        ]
+        ];
     // combine xml and send it to parent function
     return jstoxml.toXML({
         _name: 'glyph',

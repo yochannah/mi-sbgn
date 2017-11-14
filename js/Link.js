@@ -1,29 +1,55 @@
 //It's dangeous to go alone! Take this! <=========(--o
 //I may have spent far too long getting Link's sword just right.
-function Link(link) {
-    var center = {
-            source: link.source.getCenter(),
-            target: link.target.getCenter()
-        },
-        line = createElem("line");
-
-    //using the old coords, calculate a line that doesn't overlap the box
-    center.source = this.resolveEndpoint(link.source, center);
-    center.target = this.resolveEndpoint(link.target, center);
-
-    setAttr(line, "x1", center.source.x);
-    setAttr(line, "y1", center.source.y);
-    setAttr(line, "x2", center.target.x);
-    setAttr(line, "y2", center.target.y);
-    setAttr(line, "marker-end", "url(#Harpoon)");
-    setAttr(line, "marker-start", "url(#Upside-down-harpoon)");
-    this.link = link;
-    this.node = line;
-    return this;
+function Link(source, target, indexes) {
+  // d3 references the links by the index of the object it's linking to
+  // hence why we store references both to the objets themselves 
+  // and also and the indexes in the graph object.
+  this.source = indexes.source;
+  this.target = indexes.target;
+  this.sourceObject = source;
+  this.targetObject = target;
+  this.id = source + "-" + target;
+  this.coords = {};
+  return this;
 }
 
-Link.prototype.resolveEndpoint = function(box,line) {
-  return Maths.boxLineIntersection(box,line);
+Link.prototype.toXML = function () {
+  var parent = this;
+  console.log(parent);
+  return jstoxml.toXML({
+    _name: 'arc',
+    _attrs: {
+      id : parent.id,
+      class: "interaction",
+      source: parent.sourceObject,
+      target: parent.targetObject,
+    },
+     _content: [
+       {
+         _name: "start",
+         _attrs: {
+           "y": parent.coords.y1,
+           "x": parent.coords.x1
+         }
+       },
+       {
+         _name: "end",
+         _attrs: {
+           "y": parent.coords.y2,
+           "x": parent.coords.x2
+         }
+       }
+    ]
+    // {
+    //   _name: "bbox",
+    //   _attrs: graphView.boundsToSBGNCoords(parent.bounds)
+    // },
+    // parent.uoi.toXML(),
+    // parent.position.toXML(parent.bounds.y)
+    // ]
+
+  });
+
 }
 
 Link.prototype.equals = function(link) {

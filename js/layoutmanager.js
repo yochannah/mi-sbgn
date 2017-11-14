@@ -113,6 +113,7 @@ function Layout(el) {
         var locg = binding.append("g").attr("class", "locationgroup");
         var locrect = locg.append("rect");
         locrect.attr("id", function (d) {
+            //this is a sneaky way to pass d3 positions back into the model
             d.position.rect = this;
             return d.cid + "-position";
         });
@@ -129,16 +130,20 @@ function Layout(el) {
         c.on("tick", function(x, y, z) {
             //  debugger;
             link.attr("x1", function(d) {
-                    return d.source.getArrowTarget(d, this, "1").x;
+                    d.coords.x1 = d.source.getArrowTarget(d, this, "1").x;
+                return d.coords.x1;
                 })
                 .attr("y1", function(d) {
-                    return d.source.getArrowTarget(d, this, "1").y;
+                    d.coords.y1 = d.source.getArrowTarget(d, this, "1").y;
+                    return d.coords.y1;
                 })
                 .attr("x2", function(d) {
-                    return d.target.getArrowTarget(d, this, "2").x;
+                    d.coords.x2 = d.target.getArrowTarget(d, this, "2").x;
+                    return d.coords.x2;
                 })
                 .attr("y2", function(d) {
-                    return d.target.getArrowTarget(d, this, "2").y;
+                    d.coords.y2 = d.target.getArrowTarget(d, this, "2").y;
+                    return d.coords.y2;
                 });
 
             labeltext.attr("x", function(d) {
