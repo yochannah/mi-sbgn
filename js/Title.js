@@ -1,4 +1,5 @@
-var Title = Backbone.View.extend({
+export default function Title() {
+    Backbone.View.extend({
     initialize: function() {
         this.render();
         this.listenTo(this.model, "change", this.render);
@@ -14,4 +15,5 @@ var Title = Backbone.View.extend({
         });
         this.$el.html(title);
     }
-});
+})
+};

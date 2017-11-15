@@ -1,4 +1,6 @@
-function Participant(model) {
+import Label from './ParticipantLabel';
+
+export default function Participant(model) {
     this.init(model);
     return this;
 }
@@ -52,15 +54,15 @@ Participant.prototype.toXML = function () {
     });
 }
 
-Participant.prototype.init = function (model) {
+Participant.prototype.init = function (model, graphView) {
     this.model = model;
     this.node = {};
     this.interactor = this.model.get("interactor");
     this.initFeatures();
     this.initBindingSites();
+    console.log("dddddd",graphView, model)
 
     this.label = new Label(this.interactor.get("label"), this.interactor.cid);
-    this.node.p = graphView;
     graphView.addNode(this.label, this.interactor.cid);
 
     this.node.uoi = new UnitOfInformation(this.interactor.get("type").name);

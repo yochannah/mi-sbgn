@@ -1,4 +1,4 @@
-function Layout(el) {
+export default function Layout(el) {
     this.svg = svg = d3.select(el);
     this.svgsize = el.getBoundingClientRect()
     try {

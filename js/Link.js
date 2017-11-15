@@ -1,6 +1,6 @@
 //It's dangeous to go alone! Take this! <=========(--o
 //I may have spent far too long getting Link's sword just right.
-function Link(source, target, indexes) {
+export default function Link(source, target, indexes) {
   // d3 references the links by the index of the object it's linking to
   // hence why we store references both to the objets themselves 
   // and also and the indexes in the graph object.

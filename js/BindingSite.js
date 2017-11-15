@@ -1,4 +1,4 @@
-function BindingSite(model, count) {
+export default function BindingSite(model, count) {
   this.model = model;
   this.name = "binding region";
   this.cid = this.model.cid;

@@ -1,11 +1,14 @@
+import Participant from './Participant';
+
 var ComplexView = Backbone.View.extend({
     className: "sbgnContainer",
-    initialize: function () {
+    initialize: function (x) {
         this.interactors = this.model.attributes.interactors.models;
         this.participants = [];
+        this.graphView = x.graphView;
         this.render();
         this.listenTo(this.model, "change", this.render);
-    },
+     },
 
     empty: function () {
         this.$el.html("");
@@ -17,18 +20,19 @@ var ComplexView = Backbone.View.extend({
             //first we create all the elements, but we don't know
             //their layout.
             this.instantiateParticipants();
-            graphView.addLinks();
+            this.graphView.addLinks();
             this.layout = new Layout(this.el);
 
         } catch (e) {
-            console.error("%cerror", "background-color:firebrick; color:#eee;font-weight:bold;", e);
+            console.error("%cerror--", "background-color:firebrick; color:#eee;font-weight:bold;", e);
         }
         return this;
     },
     instantiateParticipants: function () {
         var parent = this;
+        console.log("perarg",parent, parent.graphView);
         this.model.get("interactions").at(0).get("participants").map(function (participant) {
-            var newParticipant = new Participant(participant);
+            var newParticipant = new Participant(participant, parent.graphView);
             parent.participants.push(newParticipant);
         });
         this.participants.map(function (participant) {
@@ -77,3 +81,5 @@ var ComplexView = Backbone.View.extend({
     }
 
 });
+
+export default ComplexView;

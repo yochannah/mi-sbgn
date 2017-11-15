@@ -1,4 +1,4 @@
-function downloadFile(fileContents, fileFormat, fileName) {
+export default function downloadFile(fileContents, fileFormat, fileName) {
     // thanks, SO, for always being there for me: 
     // https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
     // great answer from https://stackoverflow.com/users/1768690/default

@@ -1,4 +1,4 @@
-function Graph() {
+export default function Graph() {
     this.graph = {
         nodes: [],
         links: [],
@@ -89,3 +89,4 @@ function Graph() {
         }
     }
 }
+

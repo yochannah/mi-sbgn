@@ -1,10 +1,9 @@
-var count = 0;
-function Label(textContent, parentId) {
-  count++;
-  this.width= 100 + 2*styles.padding;
-  this.height= 20 + 2*styles.padding;
+export var labelcount = 0;
+export default function Label(textContent, parentId) {
+  labelcount++;
 
-  this.model = {cid: parentId + "-label-" + count};
+
+  this.model = {cid: parentId + "-label-" + labelcount};
   this.cid = this.model.cid;
   this.name = textContent;
 

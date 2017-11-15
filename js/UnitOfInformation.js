@@ -1,4 +1,4 @@
-function UnitOfInformation(info) {
+export default function UnitOfInformation(info) {
     this.info = uoiTypes[info];
 }
 UnitOfInformation.prototype.toXML = function(){

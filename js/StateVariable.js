@@ -1,5 +1,5 @@
 
-function StateVariable(info) {
+export default function StateVariable(info) {
     this.info = info;
     this.node = createElem("g");
     setAttr(this.node, "transform", "translate(0," + (-2 * (styles.textSize + styles.padding)) + ")")
