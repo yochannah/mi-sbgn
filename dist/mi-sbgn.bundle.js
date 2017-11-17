@@ -70,20 +70,25 @@
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = Participant;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ParticipantLabel__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UnitOfInformation__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BindingSite__ = __webpack_require__(4);
 
 
-function Participant(model) {
-    this.init(model);
+
+
+function Participant(model, graphView) {
+    this.graphView = graphView;
+    this.init(model); 
     return this;
 }
 
 Participant.prototype.addGroup = function () {
     var groupMembers = this.bindingSites.concat(this.label);
-    this.group = graphView.addGroup(groupMembers, this.model.cid);
+    this.group = this.graphView.addGroup(groupMembers, this.model.cid);
 }
 
 Participant.prototype.getBounds = function () {
-    return graphView.boundsToSBGNCoords(this.group.bounds);
+    return this.graphView.boundsToSBGNCoords(this.group.bounds);
 }
 
 Participant.prototype.generateBindingSiteXML = function () {
@@ -126,24 +131,23 @@ Participant.prototype.toXML = function () {
     });
 }
 
-Participant.prototype.init = function (model, graphView) {
+Participant.prototype.init = function (model) {
     this.model = model;
     this.node = {};
     this.interactor = this.model.get("interactor");
     this.initFeatures();
     this.initBindingSites();
-    console.log("dddddd",graphView, model)
 
     this.label = new __WEBPACK_IMPORTED_MODULE_0__ParticipantLabel__["a" /* default */](this.interactor.get("label"), this.interactor.cid);
-    graphView.addNode(this.label, this.interactor.cid);
+    this.graphView.addNode(this.label, this.interactor.cid);
 
-    this.node.uoi = new UnitOfInformation(this.interactor.get("type").name);
+    this.node.uoi = new __WEBPACK_IMPORTED_MODULE_1__UnitOfInformation__["a" /* default */](this.interactor.get("type").name);
 
     if (this.bindingSites) {
         var parent = this;
         parent.node.bindingSites = [];
-        this.bindingSites.map(function (site, i) {
-            var newSite = new BindingSite(site, i);
+        this.bindingSites.map(function (site) {
+            var newSite = new __WEBPACK_IMPORTED_MODULE_2__BindingSite__["a" /* default */](site, parent.graphView);
             parent.node.bindingSites.push(newSite);
         });
     }
@@ -232,8 +236,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ParticipantLabel__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__StateVariable__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Title__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__UnitOfInformation__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__XMLdownloader__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__Maths__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__UnitOfInformation__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__XMLdownloader__ = __webpack_require__(11);
 
 
 
@@ -246,18 +251,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-var styles = {
-    textSize: 5,
-    corners: 5,
-    leftOffset: 2,
-    padding: 3,
-    infoWidth: 30
-},
-    uoiTypes = {
-        protein: "mt:prot",
-        binding: "ct:bind"
-    },
-    svgElementId = "mi-sbgn",
+
+var svgElementId = "mi-sbgn",
     currentComplex = "EBI-9997373";
 
 //This is syntactic sugar and is used across all the svg element files as a common util.
@@ -311,14 +306,13 @@ function initViewer(complexName) {
                 });
             } catch (e) { console.error(e) }
         });
-        console.log(mi, complexViewer, graphView);
     });
 
 };
 
 function generateXML() {
     var complexXML = complexViewer.toXML();
-    downloadFile(complexXML, "xml", currentComplex);
+    Object(__WEBPACK_IMPORTED_MODULE_11__XMLdownloader__["a" /* default */])(complexXML, "xml", currentComplex);
 }
 
 /***/ }),
@@ -327,6 +321,9 @@ function generateXML() {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = Graph;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Link__ = __webpack_require__(6);
+
+
 function Graph() {
     this.graph = {
         nodes: [],
@@ -356,7 +353,7 @@ function Graph() {
     }
     this.isDuplicate = function (link1, link2) {
         var l1isLinkedTol2, l2isLinkedTol1,
-            l1 = this.graph.linkDeduplicationLookup[link1];
+            l1 = this.graph.linkDeduplicationLookup[link1],
         l2 = this.graph.linkDeduplicationLookup[link2];
         if (l1) {
             l1isLinkedTol2 = (l1.indexOf(link2) !== -1);
@@ -372,7 +369,7 @@ function Graph() {
             targetindex = this.graph.nodeIndexLookup[target],
             duplicatelink = this.isDuplicate(sourceindex, targetindex);
         if (!duplicatelink) {
-            var link = new Link(source, target, {
+            var link = new __WEBPACK_IMPORTED_MODULE_0__Link__["a" /* default */](source, target, {
                 source: sourceindex,
                 target: targetindex,
             });
@@ -426,16 +423,24 @@ function Graph() {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* unused harmony export default */
-function BindingSite(model, count) {
+/* harmony export (immutable) */ __webpack_exports__["a"] = BindingSite;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__UnitOfInformation__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__StateVariable__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Maths__ = __webpack_require__(12);
+
+
+
+
+function BindingSite(model, graphView) {
   this.model = model;
   this.name = "binding region";
   this.cid = this.model.cid;
+  this.graphView = graphView;
 
-  graphView.addNode(this);
+  this.graphView.addNode(this);
 
-  this.uoi = new UnitOfInformation("binding");
-  this.position = new StateVariable(model.get("pos"));
+  this.uoi = new __WEBPACK_IMPORTED_MODULE_0__UnitOfInformation__["a" /* default */]("binding");
+  this.position = new __WEBPACK_IMPORTED_MODULE_1__StateVariable__["a" /* default */](model.get("pos"));
   return this;
 }
 
@@ -450,7 +455,7 @@ BindingSite.prototype.getCenterY = function () {
 }
 
 BindingSite.prototype.getArrowTarget = function (line, previousLine, prevlinecoord) {
-  return Maths.boxLineIntersection(this, line, previousLine, prevlinecoord);
+  return Object(__WEBPACK_IMPORTED_MODULE_2__Maths__["a" /* default */])().boxLineIntersection(this, line, previousLine, prevlinecoord);
 }
 
 BindingSite.prototype.addLinks = function () {
@@ -461,7 +466,7 @@ BindingSite.prototype.addLinks = function () {
     var bindingRegions = linkedFeature.get("sequenceData");
     if (bindingRegions) {
       bindingRegions.map(function (region) {
-        graphView.addLink(parent.model.cid, region.cid);
+        parent.graphView.addLink(parent.model.cid, region.cid);
       });
     } else {
       console.error("%c something went wrong with the link for", "color:orange;", this);
@@ -485,7 +490,7 @@ BindingSite.prototype.toXML = function () {
       },
       {
         _name: "bbox",
-        _attrs: graphView.boundsToSBGNCoords(parent.bounds)
+        _attrs: parent.graphView.boundsToSBGNCoords(parent.bounds)
       },
       parent.uoi.toXML(),
       parent.position.toXML(parent.bounds.y)
@@ -500,6 +505,8 @@ BindingSite.prototype.toXML = function () {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Participant__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Layout__ = __webpack_require__(7);
+
 
 
 var ComplexView = Backbone.View.extend({
@@ -523,7 +530,7 @@ var ComplexView = Backbone.View.extend({
             //their layout.
             this.instantiateParticipants();
             this.graphView.addLinks();
-            this.layout = new Layout(this.el);
+            this.layout = new __WEBPACK_IMPORTED_MODULE_1__Layout__["a" /* default */](this.el, this.graphView);
 
         } catch (e) {
             console.error("%cerror--", "background-color:firebrick; color:#eee;font-weight:bold;", e);
@@ -532,7 +539,6 @@ var ComplexView = Backbone.View.extend({
     },
     instantiateParticipants: function () {
         var parent = this;
-        console.log("perarg",parent, parent.graphView);
         this.model.get("interactions").at(0).get("participants").map(function (participant) {
             var newParticipant = new __WEBPACK_IMPORTED_MODULE_0__Participant__["a" /* default */](participant, parent.graphView);
             parent.participants.push(newParticipant);
@@ -555,7 +561,7 @@ var ComplexView = Backbone.View.extend({
     generateLinkXML: function () {
         var parent = this,
         linkXML = [];
-        graphView.graph.links.map(function (link) {
+        parent.graphView.graph.links.map(function (link) {
             linkXML.push(link.toXML());
         });
 
@@ -591,7 +597,7 @@ var ComplexView = Backbone.View.extend({
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* unused harmony export default */
+/* harmony export (immutable) */ __webpack_exports__["a"] = Link;
 //It's dangeous to go alone! Take this! <=========(--o
 //I may have spent far too long getting Link's sword just right.
 function Link(source, target, indexes) {
@@ -609,7 +615,6 @@ function Link(source, target, indexes) {
 
 Link.prototype.toXML = function () {
   var parent = this;
-  console.log(parent);
   return jstoxml.toXML({
     _name: 'arc',
     _attrs: {
@@ -656,10 +661,20 @@ Link.prototype.equals = function(link) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* unused harmony export default */
-function Layout(el) {
-    this.svg = svg = d3.select(el);
-    this.svgsize = el.getBoundingClientRect()
+/* harmony export (immutable) */ __webpack_exports__["a"] = Layout;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Maths__ = __webpack_require__(12);
+
+
+function Layout(el, graphView) {
+    var svg = this.svg = d3.select(el);
+    this.svgsize = el.getBoundingClientRect();
+    var styles = {
+        textSize: 5,
+        corners: 5,
+        leftOffset: 2,
+        padding: 3,
+        infoWidth: 30
+    };
     try {
         var width = this.svgsize.height,
             height = this.svgsize.height,
@@ -932,27 +947,10 @@ function updateParent() {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* unused harmony export default */
+/* harmony export (immutable) */ __webpack_exports__["a"] = StateVariable;
 
 function StateVariable(info) {
     this.info = info;
-    this.node = createElem("g");
-    setAttr(this.node, "transform", "translate(0," + (-2 * (styles.textSize + styles.padding)) + ")")
-    var text = createElem("text")
-    text.appendChild(document.createTextNode(this.info));
-    var rect = createElem("rect");
-
-    setAttr(rect, "width", styles.infoWidth);
-    setAttr(rect, "rx", 5);
-    setAttr(rect, "ry", 5);
-    setAttr(rect, "height", styles.textSize + 2);
-    this.node.appendChild(rect);
-
-
-    setAttr(text, "x", styles.leftOffset * 2);
-    setAttr(text, "y", "5");
-    setAttr(text, "font-size", styles.textSize);
-    this.node.appendChild(text);
 }
 
 StateVariable.prototype.toXML = function(parentTop){
@@ -1020,8 +1018,12 @@ function Title() {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* unused harmony export default */
+/* harmony export (immutable) */ __webpack_exports__["a"] = UnitOfInformation;
 function UnitOfInformation(info) {
+    var uoiTypes = {
+        protein: "mt:prot",
+        binding: "ct:bind"
+    }
     this.info = uoiTypes[info];
 }
 UnitOfInformation.prototype.toXML = function(){
@@ -1056,7 +1058,7 @@ UnitOfInformation.prototype.toXML = function(){
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* unused harmony export default */
+/* harmony export (immutable) */ __webpack_exports__["a"] = downloadFile;
 function downloadFile(fileContents, fileFormat, fileName) {
     // thanks, SO, for always being there for me: 
     // https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
@@ -1070,6 +1072,156 @@ function downloadFile(fileContents, fileFormat, fileName) {
 
     link.click();
 }
+
+/***/ }),
+/* 12 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = Maths;
+//I wanted to call this file math, but that's already a thing in JS.
+function Maths(){
+    /**getting the correct location for translated elements is a nightmare (but a
+     necessary one, because we want to use <g> tags to group our elements and the
+     only way to locate a <g> correctly is.... translate! Thankfully, this SO person
+     is Good People: https://stackoverflow.com/questions/26049488/how-to-get-absolute-coordinates-of-object-inside-a-g-group
+    **/
+    var intersection = function(lines) {
+        return doLineSegmentsIntersect(lines.box.start, lines.box.end, lines.link.start, lines.link.end);
+    }
+    var boxLineIntersection = function(rectangle, line, previousLine, prevlinecoord) {
+        //maths here to deconstruct the box into 4 lines and see if any of them
+        //intersect with the box. Return which line and the coords.
+        var box = rectangle.node.getBBox();
+        box.center = {
+            x: rectangle.getCenterX(),
+            y: rectangle.getCenterY()
+        }
+
+        //note we could proceed straight to x and y coords of the lines but I feel
+        //it's easier to read and understand by defining each corner with a name first.
+        var corners = {
+                topleft: {
+                    x: box.x,
+                    y: box.y
+                },
+                topright: {
+                    x: box.x + box.width,
+                    y: box.y
+                },
+                bottomleft: {
+                    x: box.x,
+                    y: box.y + box.height
+                },
+                bottomright: {
+                    x: box.x + box.width,
+                    y: box.y + box.height
+                }
+            },
+            lines = {
+                top: {
+                    start: corners.topleft,
+                    end: corners.topright
+                },
+                right: {
+                    start: corners.topright,
+                    end: corners.bottomright
+                },
+                bottom: {
+                    start: corners.bottomleft,
+                    end: corners.bottomright
+                },
+                left: {
+                    start: corners.topleft,
+                    end: corners.bottomleft
+                }
+            },
+            overlapper = null,
+            newEndpoint = {
+                x: null,
+                y: null
+            }
+
+        //it should overlap one of the four lines in the target box since we are
+        //calculating from the center of the box
+        for (var lineorientation in lines) {
+            var intersects = intersection({
+                box: lines[lineorientation],
+                link: {
+                    start: line.source,
+                    end: line.target
+                }
+            });
+            //debugger;
+            if (intersects) {
+                overlapper = lineorientation;
+            }
+        }
+
+
+        //special case: the top and bottom of binding site boxes have ct:bind and
+        //binding sites located on them. We don't want to draw arrows on top of the boxes.
+        switch (overlapper) {
+            case "top":
+                newEndpoint = {
+                    x: box.center.x,
+                    y: box.y - 4
+                }
+                break;
+            case "bottom":
+                newEndpoint = {
+                    x: box.center.x,
+                    y: box.y + box.height + 4
+                }
+                break;
+            case "left":
+                newEndpoint = {
+                    x: box.x,
+                    y: box.center.y
+                }
+                break;
+            case "right":
+                newEndpoint = {
+                    x: box.x + box.width,
+                    y: box.center.y
+                }
+                break;
+            case "previous":
+                newEndpoint = {
+                    x: previousLine.getAttribute("x" + prevlinecoord),
+                    y: previousLine.getAttribute("y" + prevlinecoord)
+                }
+                console.log("%cnewEndpoint", "color:turquoise;font-weight:bold;", newEndpoint);
+                break;
+
+            default:
+                newEndpoint = {
+                    x: box.center.x,
+                    y: box.center.y
+                }
+        }
+
+        return newEndpoint;
+    }
+    var lineEnds = function (box1, box2) {
+      //takes bbox for each of two boxes
+      //get minx, maxx, miny, maxy for the box corners.
+      //determine which sides overlap, if any.
+
+      //3 cases:
+      ////1: No overlapping side. two closest xy corner pairs become the ends. Easiest. Return these pairs.
+      ////2: the Y coords overlap. This means the lines will be on the two closest X coords.
+      ////3: the X coords overlap. Flip case of 2. This means the lines will be on the two closest Y coords.
+
+      //Cases 2 & 3 require some more calculations but are reverse of each other.
+      //Case 2: the X of both lines are known, we need to calculate where the Y is. To do this:
+      //calculate the length: Take the min overlapping y and its closest y, and subtract one from the other. The absolute value of this is the length of overlap
+      //calculate the actual join locations: length/2 gives us the midpoint in the overlap. Add this number to the min Y of each of the two lines. Voila! I think this is the algorithm we want
+
+    }
+    return { boxLineIntersection: boxLineIntersection};
+};
+
 
 /***/ })
 /******/ ]);

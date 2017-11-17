@@ -1,6 +1,15 @@
-export default function Layout(el) {
-    this.svg = svg = d3.select(el);
-    this.svgsize = el.getBoundingClientRect()
+import Maths from './Maths';
+
+export default function Layout(el, graphView) {
+    var svg = this.svg = d3.select(el);
+    this.svgsize = el.getBoundingClientRect();
+    var styles = {
+        textSize: 5,
+        corners: 5,
+        leftOffset: 2,
+        padding: 3,
+        infoWidth: 30
+    };
     try {
         var width = this.svgsize.height,
             height = this.svgsize.height,

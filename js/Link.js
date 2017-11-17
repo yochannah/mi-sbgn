@@ -15,7 +15,6 @@ export default function Link(source, target, indexes) {
 
 Link.prototype.toXML = function () {
   var parent = this;
-  console.log(parent);
   return jstoxml.toXML({
     _name: 'arc',
     _attrs: {

@@ -1,4 +1,5 @@
 import Participant from './Participant';
+import Layout from './Layout';
 
 var ComplexView = Backbone.View.extend({
     className: "sbgnContainer",
@@ -21,7 +22,7 @@ var ComplexView = Backbone.View.extend({
             //their layout.
             this.instantiateParticipants();
             this.graphView.addLinks();
-            this.layout = new Layout(this.el);
+            this.layout = new Layout(this.el, this.graphView);
 
         } catch (e) {
             console.error("%cerror--", "background-color:firebrick; color:#eee;font-weight:bold;", e);
@@ -30,7 +31,6 @@ var ComplexView = Backbone.View.extend({
     },
     instantiateParticipants: function () {
         var parent = this;
-        console.log("perarg",parent, parent.graphView);
         this.model.get("interactions").at(0).get("participants").map(function (participant) {
             var newParticipant = new Participant(participant, parent.graphView);
             parent.participants.push(newParticipant);
@@ -53,7 +53,7 @@ var ComplexView = Backbone.View.extend({
     generateLinkXML: function () {
         var parent = this,
         linkXML = [];
-        graphView.graph.links.map(function (link) {
+        parent.graphView.graph.links.map(function (link) {
             linkXML.push(link.toXML());
         });
 

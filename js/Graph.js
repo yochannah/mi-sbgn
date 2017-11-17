@@ -1,3 +1,5 @@
+import Link from './Link';
+
 export default function Graph() {
     this.graph = {
         nodes: [],
@@ -27,7 +29,7 @@ export default function Graph() {
     }
     this.isDuplicate = function (link1, link2) {
         var l1isLinkedTol2, l2isLinkedTol1,
-            l1 = this.graph.linkDeduplicationLookup[link1];
+            l1 = this.graph.linkDeduplicationLookup[link1],
         l2 = this.graph.linkDeduplicationLookup[link2];
         if (l1) {
             l1isLinkedTol2 = (l1.indexOf(link2) !== -1);

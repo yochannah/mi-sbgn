@@ -1,4 +1,8 @@
 export default function UnitOfInformation(info) {
+    var uoiTypes = {
+        protein: "mt:prot",
+        binding: "ct:bind"
+    }
     this.info = uoiTypes[info];
 }
 UnitOfInformation.prototype.toXML = function(){

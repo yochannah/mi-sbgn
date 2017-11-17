@@ -7,21 +7,11 @@ import Participant from './Participant';
 import './ParticipantLabel';
 import StateVariable from './StateVariable';
 import Title from './Title';
+import Maths from './Maths';
 import UnitOfInformation from './UnitOfInformation';
-import './XMLdownloader';
+import downloadFile from './XMLdownloader';
 
-var styles = {
-    textSize: 5,
-    corners: 5,
-    leftOffset: 2,
-    padding: 3,
-    infoWidth: 30
-},
-    uoiTypes = {
-        protein: "mt:prot",
-        binding: "ct:bind"
-    },
-    svgElementId = "mi-sbgn",
+var svgElementId = "mi-sbgn",
     currentComplex = "EBI-9997373";
 
 //This is syntactic sugar and is used across all the svg element files as a common util.
@@ -75,7 +65,6 @@ function initViewer(complexName) {
                 });
             } catch (e) { console.error(e) }
         });
-        console.log(mi, complexViewer, graphView);
     });
 
 };

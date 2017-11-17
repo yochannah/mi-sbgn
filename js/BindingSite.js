@@ -1,9 +1,14 @@
-export default function BindingSite(model, count) {
+import UnitOfInformation from './UnitOfInformation';
+import StateVariable from './StateVariable';
+import Maths from './Maths';
+
+export default function BindingSite(model, graphView) {
   this.model = model;
   this.name = "binding region";
   this.cid = this.model.cid;
+  this.graphView = graphView;
 
-  graphView.addNode(this);
+  this.graphView.addNode(this);
 
   this.uoi = new UnitOfInformation("binding");
   this.position = new StateVariable(model.get("pos"));
@@ -21,7 +26,7 @@ BindingSite.prototype.getCenterY = function () {
 }
 
 BindingSite.prototype.getArrowTarget = function (line, previousLine, prevlinecoord) {
-  return Maths.boxLineIntersection(this, line, previousLine, prevlinecoord);
+  return Maths().boxLineIntersection(this, line, previousLine, prevlinecoord);
 }
 
 BindingSite.prototype.addLinks = function () {
@@ -32,7 +37,7 @@ BindingSite.prototype.addLinks = function () {
     var bindingRegions = linkedFeature.get("sequenceData");
     if (bindingRegions) {
       bindingRegions.map(function (region) {
-        graphView.addLink(parent.model.cid, region.cid);
+        parent.graphView.addLink(parent.model.cid, region.cid);
       });
     } else {
       console.error("%c something went wrong with the link for", "color:orange;", this);
@@ -56,7 +61,7 @@ BindingSite.prototype.toXML = function () {
       },
       {
         _name: "bbox",
-        _attrs: graphView.boundsToSBGNCoords(parent.bounds)
+        _attrs: parent.graphView.boundsToSBGNCoords(parent.bounds)
       },
       parent.uoi.toXML(),
       parent.position.toXML(parent.bounds.y)

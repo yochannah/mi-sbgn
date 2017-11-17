@@ -1,24 +1,14 @@
 //I wanted to call this file math, but that's already a thing in JS.
-var Maths = {
+export default function Maths(){
     /**getting the correct location for translated elements is a nightmare (but a
      necessary one, because we want to use <g> tags to group our elements and the
      only way to locate a <g> correctly is.... translate! Thankfully, this SO person
      is Good People: https://stackoverflow.com/questions/26049488/how-to-get-absolute-coordinates-of-object-inside-a-g-group
     **/
-    makeAbsoluteContext: function(element) {
-        return function(x, y) {
-            var offset = document.getElementById(svgElementId).getBoundingClientRect();
-            var matrix = element.getScreenCTM();
-            return {
-                x: (matrix.a * x) + (matrix.c * y) + matrix.e - offset.left,
-                y: (matrix.b * x) + (matrix.d * y) + matrix.f - offset.top
-            };
-        };
-    },
-    intersection: function(lines) {
+    var intersection = function(lines) {
         return doLineSegmentsIntersect(lines.box.start, lines.box.end, lines.link.start, lines.link.end);
-    },
-    boxLineIntersection: function(rectangle, line, previousLine, prevlinecoord) {
+    }
+    var boxLineIntersection = function(rectangle, line, previousLine, prevlinecoord) {
         //maths here to deconstruct the box into 4 lines and see if any of them
         //intersect with the box. Return which line and the coords.
         var box = rectangle.node.getBBox();
@@ -73,8 +63,8 @@ var Maths = {
 
         //it should overlap one of the four lines in the target box since we are
         //calculating from the center of the box
-        for (lineorientation in lines) {
-            var intersects = Maths.intersection({
+        for (var lineorientation in lines) {
+            var intersects = intersection({
                 box: lines[lineorientation],
                 link: {
                     start: line.source,
@@ -131,8 +121,8 @@ var Maths = {
         }
 
         return newEndpoint;
-    },
-    lineEnds : function (box1, box2) {
+    }
+    var lineEnds = function (box1, box2) {
       //takes bbox for each of two boxes
       //get minx, maxx, miny, maxy for the box corners.
       //determine which sides overlap, if any.
@@ -148,4 +138,5 @@ var Maths = {
       //calculate the actual join locations: length/2 gives us the midpoint in the overlap. Add this number to the min Y of each of the two lines. Voila! I think this is the algorithm we want
 
     }
+    return { boxLineIntersection: boxLineIntersection};
 };

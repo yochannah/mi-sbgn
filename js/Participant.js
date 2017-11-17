@@ -1,17 +1,20 @@
 import Label from './ParticipantLabel';
+import UnitOfInformation from './UnitOfInformation';
+import BindingSite from './BindingSite';
 
-export default function Participant(model) {
-    this.init(model);
+export default function Participant(model, graphView) {
+    this.graphView = graphView;
+    this.init(model); 
     return this;
 }
 
 Participant.prototype.addGroup = function () {
     var groupMembers = this.bindingSites.concat(this.label);
-    this.group = graphView.addGroup(groupMembers, this.model.cid);
+    this.group = this.graphView.addGroup(groupMembers, this.model.cid);
 }
 
 Participant.prototype.getBounds = function () {
-    return graphView.boundsToSBGNCoords(this.group.bounds);
+    return this.graphView.boundsToSBGNCoords(this.group.bounds);
 }
 
 Participant.prototype.generateBindingSiteXML = function () {
@@ -54,24 +57,23 @@ Participant.prototype.toXML = function () {
     });
 }
 
-Participant.prototype.init = function (model, graphView) {
+Participant.prototype.init = function (model) {
     this.model = model;
     this.node = {};
     this.interactor = this.model.get("interactor");
     this.initFeatures();
     this.initBindingSites();
-    console.log("dddddd",graphView, model)
 
     this.label = new Label(this.interactor.get("label"), this.interactor.cid);
-    graphView.addNode(this.label, this.interactor.cid);
+    this.graphView.addNode(this.label, this.interactor.cid);
 
     this.node.uoi = new UnitOfInformation(this.interactor.get("type").name);
 
     if (this.bindingSites) {
         var parent = this;
         parent.node.bindingSites = [];
-        this.bindingSites.map(function (site, i) {
-            var newSite = new BindingSite(site, i);
+        this.bindingSites.map(function (site) {
+            var newSite = new BindingSite(site, parent.graphView);
             parent.node.bindingSites.push(newSite);
         });
     }
