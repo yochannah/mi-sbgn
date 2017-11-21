@@ -109,6 +109,9 @@ UnitOfInformation.prototype.toXML = function(){
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = Maths;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__external_line_segments_intersect_js__ = __webpack_require__(23);
+
+
 //I wanted to call this file math, but that's already a thing in JS.
 function Maths(){
     /**getting the correct location for translated elements is a nightmare (but a
@@ -117,7 +120,7 @@ function Maths(){
      is Good People: https://stackoverflow.com/questions/26049488/how-to-get-absolute-coordinates-of-object-inside-a-g-group
     **/
     var intersection = function(lines) {
-        return doLineSegmentsIntersect(lines.box.start, lines.box.end, lines.link.start, lines.link.end);
+        return Object(__WEBPACK_IMPORTED_MODULE_0__external_line_segments_intersect_js__["a" /* default */])(lines.box.start, lines.box.end, lines.link.start, lines.link.end);
     }
     var boxLineIntersection = function(rectangle, line, previousLine, prevlinecoord) {
         //maths here to deconstruct the box into 4 lines and see if any of them
@@ -651,7 +654,7 @@ function Layout(el, graphView) {
         graphView.graph.nodes.forEach(function(node) {
           node.height = 41;
           node.width = 41;
-        })
+        });
 
         //Setting up cola
         var c = cola.d3adaptor(d3)
@@ -904,6 +907,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__Maths__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__UnitOfInformation__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__XMLdownloader__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__external_line_segments_intersect_js__ = __webpack_require__(23);
+
+
 
 
 
@@ -1222,6 +1228,140 @@ function downloadFile(fileContents, fileFormat, fileName) {
 
     link.click();
 }
+
+/***/ }),
+/* 13 */,
+/* 14 */,
+/* 15 */,
+/* 16 */,
+/* 17 */,
+/* 18 */,
+/* 19 */,
+/* 20 */,
+/* 21 */,
+/* 22 */,
+/* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = doLineSegmentsIntersect;
+//From https://github.com/pgkelley4/line-segments-intersect
+
+/**
+ * @author Peter Kelley
+ * @author pgkelley4@gmail.com
+ */
+
+/**
+ * See if two line segments intersect. This uses the
+ * vector cross product approach described below:
+ * http://stackoverflow.com/a/565282/786339
+ *
+ * @param {Object} p point object with x and y coordinates
+ *  representing the start of the 1st line.
+ * @param {Object} p2 point object with x and y coordinates
+ *  representing the end of the 1st line.
+ * @param {Object} q point object with x and y coordinates
+ *  representing the start of the 2nd line.
+ * @param {Object} q2 point object with x and y coordinates
+ *  representing the end of the 2nd line.
+ */
+function doLineSegmentsIntersect(p, p2, q, q2) {
+	var r = subtractPoints(p2, p);
+	var s = subtractPoints(q2, q);
+
+	var uNumerator = crossProduct(subtractPoints(q, p), r);
+	var denominator = crossProduct(r, s);
+
+	if (uNumerator == 0 && denominator == 0) {
+		// They are coLlinear
+
+		// Do they touch? (Are any of the points equal?)
+		if (equalPoints(p, q) || equalPoints(p, q2) || equalPoints(p2, q) || equalPoints(p2, q2)) {
+			return true
+		}
+		// Do they overlap? (Are all the point differences in either direction the same sign)
+		return !allEqual(
+				(q.x - p.x < 0),
+				(q.x - p2.x < 0),
+				(q2.x - p.x < 0),
+				(q2.x - p2.x < 0)) ||
+			!allEqual(
+				(q.y - p.y < 0),
+				(q.y - p2.y < 0),
+				(q2.y - p.y < 0),
+				(q2.y - p2.y < 0));
+	}
+
+	if (denominator == 0) {
+		// lines are paralell
+		return false;
+	}
+
+	var u = uNumerator / denominator;
+	var t = crossProduct(subtractPoints(q, p), s) / denominator;
+
+	return (t >= 0) && (t <= 1) && (u >= 0) && (u <= 1);
+}
+
+/**
+ * Calculate the cross product of the two points.
+ *
+ * @param {Object} point1 point object with x and y coordinates
+ * @param {Object} point2 point object with x and y coordinates
+ *
+ * @return the cross product result as a float
+ */
+function crossProduct(point1, point2) {
+	return point1.x * point2.y - point1.y * point2.x;
+}
+
+/**
+ * Subtract the second point from the first.
+ *
+ * @param {Object} point1 point object with x and y coordinates
+ * @param {Object} point2 point object with x and y coordinates
+ *
+ * @return the subtraction result as a point object
+ */
+function subtractPoints(point1, point2) {
+	var result = {};
+	result.x = point1.x - point2.x;
+	result.y = point1.y - point2.y;
+
+	return result;
+}
+
+/**
+ * See if the points are equal.
+ *
+ * @param {Object} point1 point object with x and y coordinates
+ * @param {Object} point2 point object with x and y coordinates
+ *
+ * @return if the points are equal
+ */
+function equalPoints(point1, point2) {
+	return (point1.x == point2.x) && (point1.y == point2.y)
+}
+
+/**
+ * See if all arguments are equal.
+ *
+ * @param {...} args arguments that will be compared by '=='.
+ *
+ * @return if all arguments are equal
+ */
+function allEqual(args) {
+	var firstValue = arguments[0],
+		i;
+	for (i = 1; i < arguments.length; i += 1) {
+		if (arguments[i] != firstValue) {
+			return false;
+		}
+	}
+	return true;
+}
+
 
 /***/ })
 /******/ ]);

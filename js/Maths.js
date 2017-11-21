@@ -1,3 +1,5 @@
+import doLineSegmentsIntersect from './external/line-segments-intersect.js';
+
 //I wanted to call this file math, but that's already a thing in JS.
 export default function Maths(){
     /**getting the correct location for translated elements is a nightmare (but a

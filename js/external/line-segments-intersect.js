@@ -19,7 +19,7 @@
  * @param {Object} q2 point object with x and y coordinates
  *  representing the end of the 2nd line.
  */
-function doLineSegmentsIntersect(p, p2, q, q2) {
+export default function doLineSegmentsIntersect(p, p2, q, q2) {
 	var r = subtractPoints(p2, p);
 	var s = subtractPoints(q2, q);
 

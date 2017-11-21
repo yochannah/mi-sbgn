@@ -1,9 +1,12 @@
 const path = require('path');
 
 module.exports = {
-  entry: './js/script.js',
+  entry: {
+    main : './js/script.js',
+    dependencies : './js/dependencies.js'
+},
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'mi-sbgn.bundle.js'
+    filename: 'mi-sbgn-[name].bundle.js'
   }
 };

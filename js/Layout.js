@@ -46,7 +46,7 @@ export default function Layout(el, graphView) {
         graphView.graph.nodes.forEach(function(node) {
           node.height = 41;
           node.width = 41;
-        })
+        });
 
         //Setting up cola
         var c = cola.d3adaptor(d3)

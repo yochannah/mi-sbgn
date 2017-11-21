@@ -10,6 +10,8 @@ import Title from './Title';
 import Maths from './Maths';
 import UnitOfInformation from './UnitOfInformation';
 import downloadFile from './XMLdownloader';
+import doLineSegmentsIntersect from './external/line-segments-intersect.js';
+
 
 var svgElementId = "mi-sbgn",
     currentComplex = "EBI-9997373";
