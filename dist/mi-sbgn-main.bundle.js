@@ -60,11 +60,361 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 8);
+/******/ 	return __webpack_require__(__webpack_require__.s = 185);
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */
+/******/ ({
+
+/***/ 185:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setAttr", function() { return setAttr; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createElem", function() { return createElem; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "graphView", function() { return graphView; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "complexViewer", function() { return complexViewer; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Graph__ = __webpack_require__(186);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__BindingSite__ = __webpack_require__(93);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ComplexView__ = __webpack_require__(187);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Link__ = __webpack_require__(92);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Layout__ = __webpack_require__(98);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Participant__ = __webpack_require__(96);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ParticipantLabel__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__StateVariable__ = __webpack_require__(94);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Title__ = __webpack_require__(188);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__Maths__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__UnitOfInformation__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__XMLdownloader__ = __webpack_require__(189);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__external_line_segments_intersect_js__ = __webpack_require__(95);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var svgElementId = "mi-sbgn",
+    currentComplex = "EBI-9997373";
+
+//This is syntactic sugar and is used across all the svg element files as a common util.
+var setAttr = function (elem, x, y) {
+    elem.setAttributeNS(null, x, y);
+},
+    createElem = function (elemName) {
+        return document.createElementNS("http://www.w3.org/2000/svg", elemName);
+    },
+    graphView = new __WEBPACK_IMPORTED_MODULE_0__Graph__["a" /* default */](),
+    complexViewer = null;
+
+document.addEventListener("DOMContentLoaded", function (event) {
+    //  initViewer("EBI-10828997");
+    initViewer(currentComplex);
+    //  initViewer("EBI-9008420");
+    //  initViewer("EBI-8869931");
+});
+
+var generateXMLButtons = document.querySelectorAll(".download-sbgn");
+for (var i = 0; i < generateXMLButtons.length; i++) {
+    var XMLButton = generateXMLButtons.item(i);
+    XMLButton.addEventListener("click", function (event) {
+        generateXML();
+    });
+}
+
+////// Selector for complexes:
+document.getElementById("complexSelector").addEventListener("change", function (event) {
+    complexViewer.empty();
+    graphView = new __WEBPACK_IMPORTED_MODULE_0__Graph__["a" /* default */]();
+    initViewer(event.target.value);
+});
+
+function initViewer(complexName) {
+    currentComplex = complexName;
+    $.get({
+        dataType: "json",
+        url: "https://www.ebi.ac.uk/intact/complex-ws/export/" + complexName
+    }, function (data) {
+        var mi = new MIModel(data).load().then(function (model) {
+            try {
+                complexViewer = new __WEBPACK_IMPORTED_MODULE_2__ComplexView__["a" /* default */]({
+                    model: model,
+                    el: document.getElementById(svgElementId),
+                    graphView : graphView
+                });
+                new __WEBPACK_IMPORTED_MODULE_8__Title__["a" /* default */]({
+                    model: model,
+                    el: document.getElementById('complextitle')
+                });
+            } catch (e) { console.error(e) }
+        });
+    });
+
+};
+
+function generateXML() {
+    var complexXML = complexViewer.toXML();
+    Object(__WEBPACK_IMPORTED_MODULE_11__XMLdownloader__["a" /* default */])(complexXML, "xml", currentComplex);
+}
+
+/***/ }),
+
+/***/ 186:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = Graph;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Link__ = __webpack_require__(92);
+
+
+function Graph() {
+    this.graph = {
+        nodes: [],
+        links: [],
+        linkDeduplicationLookup: {},
+        nodeIndexLookup: {},
+        groups: []
+    };
+    this.addNode = function (node) {
+        // adds a node and stores a reference to each node in a lookup table, since
+        // cola (the layout library)
+        // runs based on index of nodes rather than ids.
+        this.graph.nodeIndexLookup[node.model.cid] = this.graph.nodes.length;
+        this.graph.nodes.push(node);
+        return node;
+    };
+    this.addLinkIndex = function (link1, link2) {
+        if (this.graph.linkDeduplicationLookup[link1]) {
+            this.graph.linkDeduplicationLookup[link1].push(link2);
+        } else {
+            this.graph.linkDeduplicationLookup[link1] = [link2];
+        }
+    }
+    this.addLinkIndexes = function (link1, link2) {
+        this.addLinkIndex(link2, link1);
+        this.addLinkIndex(link1, link2);
+    }
+    this.isDuplicate = function (link1, link2) {
+        var l1isLinkedTol2, l2isLinkedTol1,
+            l1 = this.graph.linkDeduplicationLookup[link1],
+        l2 = this.graph.linkDeduplicationLookup[link2];
+        if (l1) {
+            l1isLinkedTol2 = (l1.indexOf(link2) !== -1);
+        }
+        if (l2) {
+            l2isLinkedTol1 = (l2.indexOf(link1) !== -1);
+        }
+        return l1isLinkedTol2 || l2isLinkedTol1;
+    }
+    this.addLink = function (source, target) {
+        //adds a single link. Please provide the cid of each model as source/target.
+        var sourceindex = this.graph.nodeIndexLookup[source],
+            targetindex = this.graph.nodeIndexLookup[target],
+            duplicatelink = this.isDuplicate(sourceindex, targetindex);
+        if (!duplicatelink) {
+            var link = new __WEBPACK_IMPORTED_MODULE_0__Link__["a" /* default */](source, target, {
+                source: sourceindex,
+                target: targetindex,
+            });
+            this.addLinkIndexes(sourceindex, targetindex);
+
+            this.graph.links.push(link);
+        }
+    };
+    this.updateNodeSizes = function () {
+        this.graph.nodes.map(function (node) {
+            var bb = node.node.getBBox();
+            node.width = bb.width,
+                node.height = bb.height;
+        })
+    }
+
+    this.addGroup = function (group, parentCid) {
+        var g = {
+            leaves: [],
+            padding: 3,
+            margin: 6
+        }
+        parent = this;
+        group.map(function (groupMember) {
+            var identifier = groupMember.cid;
+            g.leaves.push(parent.graph.nodeIndexLookup[identifier]);
+        });
+        this.graph.groups.push(g);
+        return g;
+    };
+    this.addLinks = function () {
+        //Adds all links for nodes. This needs to be run after all nodes have been created.
+        this.graph.nodes.map(function (aNode) {
+            aNode.addLinks();
+        });
+    }
+    this.boundsToSBGNCoords = function (someNodeBounds) {
+        return {
+            y: someNodeBounds.y.toFixed(0), //I don't know why but this is so goshdarned wrong.
+            x: someNodeBounds.x.toFixed(0),
+            w: (someNodeBounds.X - someNodeBounds.x).toFixed(0),
+            h: (someNodeBounds.Y - someNodeBounds.y).toFixed(0)
+        }
+    }
+}
+
+
+
+/***/ }),
+
+/***/ 187:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Participant__ = __webpack_require__(96);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Layout__ = __webpack_require__(98);
+
+
+
+var ComplexView = Backbone.View.extend({
+    className: "sbgnContainer",
+    initialize: function (x) {
+        this.interactors = this.model.attributes.interactors.models;
+        this.participants = [];
+        this.graphView = x.graphView;
+        this.render();
+        this.listenTo(this.model, "change", this.render);
+     },
+
+    empty: function () {
+        this.$el.html("");
+        this.node = null;
+    },
+    render: function () {
+
+        try {
+            //first we create all the elements, but we don't know
+            //their layout.
+            this.instantiateParticipants();
+            this.graphView.addLinks();
+            this.layout = new __WEBPACK_IMPORTED_MODULE_1__Layout__["a" /* default */](this.el, this.graphView);
+
+        } catch (e) {
+            console.error("%cerror--", "background-color:firebrick; color:#eee;font-weight:bold;", e);
+        }
+        return this;
+    },
+    instantiateParticipants: function () {
+        var parent = this;
+        this.model.get("interactions").at(0).get("participants").map(function (participant) {
+            var newParticipant = new __WEBPACK_IMPORTED_MODULE_0__Participant__["a" /* default */](participant, parent.graphView);
+            parent.participants.push(newParticipant);
+        });
+        this.participants.map(function (participant) {
+            participant.addGroup();
+        });
+    },
+    generateParticipantXML: function () {
+        var parent = this,
+        participantXML = [];
+
+        parent.participants.map(function (participant) {
+            participantXML.push(participant.toXML());
+        });
+
+        return participantXML;
+
+    },
+    generateLinkXML: function () {
+        var parent = this,
+        linkXML = [];
+        parent.graphView.graph.links.map(function (link) {
+            linkXML.push(link.toXML());
+        });
+
+        return linkXML;
+
+    },
+    toXML: function () {
+        var participantXML = this.generateParticipantXML(),
+            linkXML = this.generateLinkXML();
+        return jstoxml.toXML({
+            _name: 'sbgn',
+            _content: {
+                _attrs: {
+                    language: "entity relationship"
+                },
+                _content: participantXML.concat(linkXML),
+                _name: "map"
+            },
+            _attrs: {
+                xmlns: 'http://sbgn.org/libsbgn/0.2'
+            }
+        }, {
+            header: true
+        });
+    }
+
+});
+
+/* harmony default export */ __webpack_exports__["a"] = (ComplexView);
+
+/***/ }),
+
+/***/ 188:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = Title;
+function Title() {
+    Backbone.View.extend({
+    initialize: function() {
+        this.render();
+        this.listenTo(this.model, "change", this.render);
+    },
+    render: function() {
+        var ids = this.model.get("interactions").models[0].get("identifiers"),
+            title;
+        ids.map(function(id) {
+            //this might be a little fragile. Will they all have Intact IDs? haha.
+            if (id.db === "intact") {
+                title = id.id;
+            }
+        });
+        this.$el.html(title);
+    }
+})
+};
+
+
+/***/ }),
+
+/***/ 189:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = downloadFile;
+function downloadFile(fileContents, fileFormat, fileName) {
+    // thanks, SO, for always being there for me: 
+    // https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
+    // great answer from https://stackoverflow.com/users/1768690/default
+    let encodingType = "data:text/" + fileFormat + ";charset=utf-8,";
+    var encodedUri = encodeURI(encodingType + fileContents);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", (fileName + ".xml"));
+    document.body.appendChild(link); // Required for FF
+
+    link.click();
+}
+
+/***/ }),
+
+/***/ 47:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -104,12 +454,13 @@ UnitOfInformation.prototype.toXML = function(){
 
 
 /***/ }),
-/* 1 */
+
+/***/ 48:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = Maths;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__external_line_segments_intersect_js__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__external_line_segments_intersect_js__ = __webpack_require__(95);
 
 
 //I wanted to call this file math, but that's already a thing in JS.
@@ -257,7 +608,8 @@ function Maths(){
 
 
 /***/ }),
-/* 2 */
+
+/***/ 92:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -321,14 +673,15 @@ Link.prototype.equals = function(link) {
 
 
 /***/ }),
-/* 3 */
+
+/***/ 93:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = BindingSite;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__UnitOfInformation__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__StateVariable__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Maths__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__UnitOfInformation__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__StateVariable__ = __webpack_require__(94);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Maths__ = __webpack_require__(48);
 
 
 
@@ -402,7 +755,8 @@ BindingSite.prototype.toXML = function () {
 }
 
 /***/ }),
-/* 4 */
+
+/***/ 94:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -446,14 +800,140 @@ StateVariable.prototype.toXML = function(parentTop){
 
 
 /***/ }),
-/* 5 */
+
+/***/ 95:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = doLineSegmentsIntersect;
+//From https://github.com/pgkelley4/line-segments-intersect
+
+/**
+ * @author Peter Kelley
+ * @author pgkelley4@gmail.com
+ */
+
+/**
+ * See if two line segments intersect. This uses the
+ * vector cross product approach described below:
+ * http://stackoverflow.com/a/565282/786339
+ *
+ * @param {Object} p point object with x and y coordinates
+ *  representing the start of the 1st line.
+ * @param {Object} p2 point object with x and y coordinates
+ *  representing the end of the 1st line.
+ * @param {Object} q point object with x and y coordinates
+ *  representing the start of the 2nd line.
+ * @param {Object} q2 point object with x and y coordinates
+ *  representing the end of the 2nd line.
+ */
+function doLineSegmentsIntersect(p, p2, q, q2) {
+	var r = subtractPoints(p2, p);
+	var s = subtractPoints(q2, q);
+
+	var uNumerator = crossProduct(subtractPoints(q, p), r);
+	var denominator = crossProduct(r, s);
+
+	if (uNumerator == 0 && denominator == 0) {
+		// They are coLlinear
+
+		// Do they touch? (Are any of the points equal?)
+		if (equalPoints(p, q) || equalPoints(p, q2) || equalPoints(p2, q) || equalPoints(p2, q2)) {
+			return true
+		}
+		// Do they overlap? (Are all the point differences in either direction the same sign)
+		return !allEqual(
+				(q.x - p.x < 0),
+				(q.x - p2.x < 0),
+				(q2.x - p.x < 0),
+				(q2.x - p2.x < 0)) ||
+			!allEqual(
+				(q.y - p.y < 0),
+				(q.y - p2.y < 0),
+				(q2.y - p.y < 0),
+				(q2.y - p2.y < 0));
+	}
+
+	if (denominator == 0) {
+		// lines are paralell
+		return false;
+	}
+
+	var u = uNumerator / denominator;
+	var t = crossProduct(subtractPoints(q, p), s) / denominator;
+
+	return (t >= 0) && (t <= 1) && (u >= 0) && (u <= 1);
+}
+
+/**
+ * Calculate the cross product of the two points.
+ *
+ * @param {Object} point1 point object with x and y coordinates
+ * @param {Object} point2 point object with x and y coordinates
+ *
+ * @return the cross product result as a float
+ */
+function crossProduct(point1, point2) {
+	return point1.x * point2.y - point1.y * point2.x;
+}
+
+/**
+ * Subtract the second point from the first.
+ *
+ * @param {Object} point1 point object with x and y coordinates
+ * @param {Object} point2 point object with x and y coordinates
+ *
+ * @return the subtraction result as a point object
+ */
+function subtractPoints(point1, point2) {
+	var result = {};
+	result.x = point1.x - point2.x;
+	result.y = point1.y - point2.y;
+
+	return result;
+}
+
+/**
+ * See if the points are equal.
+ *
+ * @param {Object} point1 point object with x and y coordinates
+ * @param {Object} point2 point object with x and y coordinates
+ *
+ * @return if the points are equal
+ */
+function equalPoints(point1, point2) {
+	return (point1.x == point2.x) && (point1.y == point2.y)
+}
+
+/**
+ * See if all arguments are equal.
+ *
+ * @param {...} args arguments that will be compared by '=='.
+ *
+ * @return if all arguments are equal
+ */
+function allEqual(args) {
+	var firstValue = arguments[0],
+		i;
+	for (i = 1; i < arguments.length; i += 1) {
+		if (arguments[i] != firstValue) {
+			return false;
+		}
+	}
+	return true;
+}
+
+
+/***/ }),
+
+/***/ 96:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = Participant;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ParticipantLabel__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UnitOfInformation__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BindingSite__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ParticipantLabel__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UnitOfInformation__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BindingSite__ = __webpack_require__(93);
 
 
 
@@ -571,7 +1051,8 @@ Participant.prototype.initBindingSites = function () {
 }
 
 /***/ }),
-/* 6 */
+
+/***/ 97:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -600,12 +1081,13 @@ Label.prototype.setLocation = function(x, y){
 
 
 /***/ }),
-/* 7 */
+
+/***/ 98:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = Layout;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Maths__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Maths__ = __webpack_require__(48);
 
 
 function Layout(el, graphView) {
@@ -885,483 +1367,6 @@ function updateParent() {
 }
 
 
-/***/ }),
-/* 8 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setAttr", function() { return setAttr; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createElem", function() { return createElem; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "graphView", function() { return graphView; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "complexViewer", function() { return complexViewer; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Graph__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__BindingSite__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ComplexView__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Link__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Layout__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Participant__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ParticipantLabel__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__StateVariable__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Title__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__Maths__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__UnitOfInformation__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__XMLdownloader__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__external_line_segments_intersect_js__ = __webpack_require__(23);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var svgElementId = "mi-sbgn",
-    currentComplex = "EBI-9997373";
-
-//This is syntactic sugar and is used across all the svg element files as a common util.
-var setAttr = function (elem, x, y) {
-    elem.setAttributeNS(null, x, y);
-},
-    createElem = function (elemName) {
-        return document.createElementNS("http://www.w3.org/2000/svg", elemName);
-    },
-    graphView = new __WEBPACK_IMPORTED_MODULE_0__Graph__["a" /* default */](),
-    complexViewer = null;
-
-document.addEventListener("DOMContentLoaded", function (event) {
-    //  initViewer("EBI-10828997");
-    initViewer(currentComplex);
-    //  initViewer("EBI-9008420");
-    //  initViewer("EBI-8869931");
-});
-
-var generateXMLButtons = document.querySelectorAll(".download-sbgn");
-for (var i = 0; i < generateXMLButtons.length; i++) {
-    var XMLButton = generateXMLButtons.item(i);
-    XMLButton.addEventListener("click", function (event) {
-        generateXML();
-    });
-}
-
-////// Selector for complexes:
-document.getElementById("complexSelector").addEventListener("change", function (event) {
-    complexViewer.empty();
-    graphView = new __WEBPACK_IMPORTED_MODULE_0__Graph__["a" /* default */]();
-    initViewer(event.target.value);
-});
-
-function initViewer(complexName) {
-    currentComplex = complexName;
-    $.get({
-        dataType: "json",
-        url: "https://www.ebi.ac.uk/intact/complex-ws/export/" + complexName
-    }, function (data) {
-        var mi = new MIModel(data).load().then(function (model) {
-            try {
-                complexViewer = new __WEBPACK_IMPORTED_MODULE_2__ComplexView__["a" /* default */]({
-                    model: model,
-                    el: document.getElementById(svgElementId),
-                    graphView : graphView
-                });
-                new __WEBPACK_IMPORTED_MODULE_8__Title__["a" /* default */]({
-                    model: model,
-                    el: document.getElementById('complextitle')
-                });
-            } catch (e) { console.error(e) }
-        });
-    });
-
-};
-
-function generateXML() {
-    var complexXML = complexViewer.toXML();
-    Object(__WEBPACK_IMPORTED_MODULE_11__XMLdownloader__["a" /* default */])(complexXML, "xml", currentComplex);
-}
-
-/***/ }),
-/* 9 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = Graph;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Link__ = __webpack_require__(2);
-
-
-function Graph() {
-    this.graph = {
-        nodes: [],
-        links: [],
-        linkDeduplicationLookup: {},
-        nodeIndexLookup: {},
-        groups: []
-    };
-    this.addNode = function (node) {
-        // adds a node and stores a reference to each node in a lookup table, since
-        // cola (the layout library)
-        // runs based on index of nodes rather than ids.
-        this.graph.nodeIndexLookup[node.model.cid] = this.graph.nodes.length;
-        this.graph.nodes.push(node);
-        return node;
-    };
-    this.addLinkIndex = function (link1, link2) {
-        if (this.graph.linkDeduplicationLookup[link1]) {
-            this.graph.linkDeduplicationLookup[link1].push(link2);
-        } else {
-            this.graph.linkDeduplicationLookup[link1] = [link2];
-        }
-    }
-    this.addLinkIndexes = function (link1, link2) {
-        this.addLinkIndex(link2, link1);
-        this.addLinkIndex(link1, link2);
-    }
-    this.isDuplicate = function (link1, link2) {
-        var l1isLinkedTol2, l2isLinkedTol1,
-            l1 = this.graph.linkDeduplicationLookup[link1],
-        l2 = this.graph.linkDeduplicationLookup[link2];
-        if (l1) {
-            l1isLinkedTol2 = (l1.indexOf(link2) !== -1);
-        }
-        if (l2) {
-            l2isLinkedTol1 = (l2.indexOf(link1) !== -1);
-        }
-        return l1isLinkedTol2 || l2isLinkedTol1;
-    }
-    this.addLink = function (source, target) {
-        //adds a single link. Please provide the cid of each model as source/target.
-        var sourceindex = this.graph.nodeIndexLookup[source],
-            targetindex = this.graph.nodeIndexLookup[target],
-            duplicatelink = this.isDuplicate(sourceindex, targetindex);
-        if (!duplicatelink) {
-            var link = new __WEBPACK_IMPORTED_MODULE_0__Link__["a" /* default */](source, target, {
-                source: sourceindex,
-                target: targetindex,
-            });
-            this.addLinkIndexes(sourceindex, targetindex);
-
-            this.graph.links.push(link);
-        }
-    };
-    this.updateNodeSizes = function () {
-        this.graph.nodes.map(function (node) {
-            var bb = node.node.getBBox();
-            node.width = bb.width,
-                node.height = bb.height;
-        })
-    }
-
-    this.addGroup = function (group, parentCid) {
-        var g = {
-            leaves: [],
-            padding: 3,
-            margin: 6
-        }
-        parent = this;
-        group.map(function (groupMember) {
-            var identifier = groupMember.cid;
-            g.leaves.push(parent.graph.nodeIndexLookup[identifier]);
-        });
-        this.graph.groups.push(g);
-        return g;
-    };
-    this.addLinks = function () {
-        //Adds all links for nodes. This needs to be run after all nodes have been created.
-        this.graph.nodes.map(function (aNode) {
-            aNode.addLinks();
-        });
-    }
-    this.boundsToSBGNCoords = function (someNodeBounds) {
-        return {
-            y: someNodeBounds.y.toFixed(0), //I don't know why but this is so goshdarned wrong.
-            x: someNodeBounds.x.toFixed(0),
-            w: (someNodeBounds.X - someNodeBounds.x).toFixed(0),
-            h: (someNodeBounds.Y - someNodeBounds.y).toFixed(0)
-        }
-    }
-}
-
-
-
-/***/ }),
-/* 10 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Participant__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Layout__ = __webpack_require__(7);
-
-
-
-var ComplexView = Backbone.View.extend({
-    className: "sbgnContainer",
-    initialize: function (x) {
-        this.interactors = this.model.attributes.interactors.models;
-        this.participants = [];
-        this.graphView = x.graphView;
-        this.render();
-        this.listenTo(this.model, "change", this.render);
-     },
-
-    empty: function () {
-        this.$el.html("");
-        this.node = null;
-    },
-    render: function () {
-
-        try {
-            //first we create all the elements, but we don't know
-            //their layout.
-            this.instantiateParticipants();
-            this.graphView.addLinks();
-            this.layout = new __WEBPACK_IMPORTED_MODULE_1__Layout__["a" /* default */](this.el, this.graphView);
-
-        } catch (e) {
-            console.error("%cerror--", "background-color:firebrick; color:#eee;font-weight:bold;", e);
-        }
-        return this;
-    },
-    instantiateParticipants: function () {
-        var parent = this;
-        this.model.get("interactions").at(0).get("participants").map(function (participant) {
-            var newParticipant = new __WEBPACK_IMPORTED_MODULE_0__Participant__["a" /* default */](participant, parent.graphView);
-            parent.participants.push(newParticipant);
-        });
-        this.participants.map(function (participant) {
-            participant.addGroup();
-        });
-    },
-    generateParticipantXML: function () {
-        var parent = this,
-        participantXML = [];
-
-        parent.participants.map(function (participant) {
-            participantXML.push(participant.toXML());
-        });
-
-        return participantXML;
-
-    },
-    generateLinkXML: function () {
-        var parent = this,
-        linkXML = [];
-        parent.graphView.graph.links.map(function (link) {
-            linkXML.push(link.toXML());
-        });
-
-        return linkXML;
-
-    },
-    toXML: function () {
-        var participantXML = this.generateParticipantXML(),
-            linkXML = this.generateLinkXML();
-        return jstoxml.toXML({
-            _name: 'sbgn',
-            _content: {
-                _attrs: {
-                    language: "entity relationship"
-                },
-                _content: participantXML.concat(linkXML),
-                _name: "map"
-            },
-            _attrs: {
-                xmlns: 'http://sbgn.org/libsbgn/0.2'
-            }
-        }, {
-            header: true
-        });
-    }
-
-});
-
-/* harmony default export */ __webpack_exports__["a"] = (ComplexView);
-
-/***/ }),
-/* 11 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = Title;
-function Title() {
-    Backbone.View.extend({
-    initialize: function() {
-        this.render();
-        this.listenTo(this.model, "change", this.render);
-    },
-    render: function() {
-        var ids = this.model.get("interactions").models[0].get("identifiers"),
-            title;
-        ids.map(function(id) {
-            //this might be a little fragile. Will they all have Intact IDs? haha.
-            if (id.db === "intact") {
-                title = id.id;
-            }
-        });
-        this.$el.html(title);
-    }
-})
-};
-
-
-/***/ }),
-/* 12 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = downloadFile;
-function downloadFile(fileContents, fileFormat, fileName) {
-    // thanks, SO, for always being there for me: 
-    // https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
-    // great answer from https://stackoverflow.com/users/1768690/default
-    let encodingType = "data:text/" + fileFormat + ";charset=utf-8,";
-    var encodedUri = encodeURI(encodingType + fileContents);
-    var link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", (fileName + ".xml"));
-    document.body.appendChild(link); // Required for FF
-
-    link.click();
-}
-
-/***/ }),
-/* 13 */,
-/* 14 */,
-/* 15 */,
-/* 16 */,
-/* 17 */,
-/* 18 */,
-/* 19 */,
-/* 20 */,
-/* 21 */,
-/* 22 */,
-/* 23 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = doLineSegmentsIntersect;
-//From https://github.com/pgkelley4/line-segments-intersect
-
-/**
- * @author Peter Kelley
- * @author pgkelley4@gmail.com
- */
-
-/**
- * See if two line segments intersect. This uses the
- * vector cross product approach described below:
- * http://stackoverflow.com/a/565282/786339
- *
- * @param {Object} p point object with x and y coordinates
- *  representing the start of the 1st line.
- * @param {Object} p2 point object with x and y coordinates
- *  representing the end of the 1st line.
- * @param {Object} q point object with x and y coordinates
- *  representing the start of the 2nd line.
- * @param {Object} q2 point object with x and y coordinates
- *  representing the end of the 2nd line.
- */
-function doLineSegmentsIntersect(p, p2, q, q2) {
-	var r = subtractPoints(p2, p);
-	var s = subtractPoints(q2, q);
-
-	var uNumerator = crossProduct(subtractPoints(q, p), r);
-	var denominator = crossProduct(r, s);
-
-	if (uNumerator == 0 && denominator == 0) {
-		// They are coLlinear
-
-		// Do they touch? (Are any of the points equal?)
-		if (equalPoints(p, q) || equalPoints(p, q2) || equalPoints(p2, q) || equalPoints(p2, q2)) {
-			return true
-		}
-		// Do they overlap? (Are all the point differences in either direction the same sign)
-		return !allEqual(
-				(q.x - p.x < 0),
-				(q.x - p2.x < 0),
-				(q2.x - p.x < 0),
-				(q2.x - p2.x < 0)) ||
-			!allEqual(
-				(q.y - p.y < 0),
-				(q.y - p2.y < 0),
-				(q2.y - p.y < 0),
-				(q2.y - p2.y < 0));
-	}
-
-	if (denominator == 0) {
-		// lines are paralell
-		return false;
-	}
-
-	var u = uNumerator / denominator;
-	var t = crossProduct(subtractPoints(q, p), s) / denominator;
-
-	return (t >= 0) && (t <= 1) && (u >= 0) && (u <= 1);
-}
-
-/**
- * Calculate the cross product of the two points.
- *
- * @param {Object} point1 point object with x and y coordinates
- * @param {Object} point2 point object with x and y coordinates
- *
- * @return the cross product result as a float
- */
-function crossProduct(point1, point2) {
-	return point1.x * point2.y - point1.y * point2.x;
-}
-
-/**
- * Subtract the second point from the first.
- *
- * @param {Object} point1 point object with x and y coordinates
- * @param {Object} point2 point object with x and y coordinates
- *
- * @return the subtraction result as a point object
- */
-function subtractPoints(point1, point2) {
-	var result = {};
-	result.x = point1.x - point2.x;
-	result.y = point1.y - point2.y;
-
-	return result;
-}
-
-/**
- * See if the points are equal.
- *
- * @param {Object} point1 point object with x and y coordinates
- * @param {Object} point2 point object with x and y coordinates
- *
- * @return if the points are equal
- */
-function equalPoints(point1, point2) {
-	return (point1.x == point2.x) && (point1.y == point2.y)
-}
-
-/**
- * See if all arguments are equal.
- *
- * @param {...} args arguments that will be compared by '=='.
- *
- * @return if all arguments are equal
- */
-function allEqual(args) {
-	var firstValue = arguments[0],
-		i;
-	for (i = 1; i < arguments.length; i += 1) {
-		if (arguments[i] != firstValue) {
-			return false;
-		}
-	}
-	return true;
-}
-
-
 /***/ })
-/******/ ]);
+
+/******/ });
