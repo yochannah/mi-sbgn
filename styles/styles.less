@@ -1,6 +1,6 @@
 @bg-color: #fff;
 @fg-color: #333;
-
+@spacer: 1em;
 .blackandwhitebox {
     fill: @bg-color;
     stroke: @fg-color;
@@ -11,7 +11,6 @@ body {
     font-family: sans-serif;
 }
 
-
 .BindingSite,
 line,
 rect {
@@ -20,7 +19,6 @@ rect {
 
 marker {
     fill: @fg-color;
-    #Harpoon {fill:red}
 }
 
 text {
@@ -40,7 +38,7 @@ html {
 body {
     background-color: #f3f3f3;
     min-height: 100%;
-    padding: 0;
+    padding: 0 @spacer;
     margin: 0;
     box-sizing: border-box;
     display: flex;
@@ -49,29 +47,76 @@ body {
 
 #mi-sbgn {
     background: #fff;
-    box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;
     font-family: courier, monospace;
     border: solid 3px @fg-color;
-    width:100%;
-    flex-grow:1;
-    box-sizing:border-box;
-    align-self:center;
+    width: 100%;
+    flex-grow: 1;
+    box-sizing: border-box;
+    align-self: center;
 }
 
 #def {
     height: 0;
 }
 
-main {
+.svgcontainer {
     flex-grow: 1;
-    box-sizing:border-box;
-    width:100%;
-    display:flex;flex-direction:column
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    flex-direction: column
 }
 
-.Label {stroke:none;}
+main {
+    padding-top:@spacer;
+    flex-direction: row;
+    display: flex;
+    flex-grow: 1;
+}
 
+.Label {
+    stroke: none;
+}
 
-.label {fill:green}
-.node {fill:red;}
+aside {
+    min-width: 200px;
+    padding: 0 @spacer @spacer 0;
+    label {
+        margin-bottom: @spacer;
+    }
+    button {
+        @buttoncolor: #7CB342;
+        @buttonbordercolor: darken(@buttoncolor, 15%);
+        margin: @spacer 0 0 0;
+        background-color: @buttoncolor;
+        color: #fff;
+        cursor: pointer;
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+        border: 0;
+        border-right: solid 2px @buttonbordercolor;
+        border-bottom: solid 3px @buttonbordercolor;
+        border-radius: 2px;
+        padding: @spacer;
+        box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+        &:hover {
+            background-color: lighten(@buttoncolor, 5%);
+            box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+            border-right: solid 2px lighten(@buttonbordercolor, 5%);
+            border-bottom: solid 3px lighten(@buttonbordercolor, 5%);
+        }
+        svg {
+            width: @spacer;
+            fill: #fff;
+        }
+    }
+}
+
+header {
+    display:flex; align-items: baseline;
+    h1 {margin-right:@spacer;}
+    background-color:#fff; margin-left:-@spacer; margin-right:-@spacer;
+    box-shadow:2px 2px 2px rgba(0,0,0,0.1);
+    padding:0 @spacer;
+}

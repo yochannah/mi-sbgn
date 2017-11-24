@@ -82,10 +82,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__model_Participant__ = __webpack_require__(96);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__model_ParticipantLabel__ = __webpack_require__(97);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__model_StateVariable__ = __webpack_require__(94);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Title__ = __webpack_require__(188);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__Maths__ = __webpack_require__(48);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__model_UnitOfInformation__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__XMLdownloader__ = __webpack_require__(189);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Maths__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__model_UnitOfInformation__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__XMLdownloader__ = __webpack_require__(189);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__router__ = __webpack_require__(497);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__external_line_segments_intersect_js__ = __webpack_require__(95);
 
 
@@ -105,36 +105,32 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 var svgElementId = "mi-sbgn",
     currentComplex = "EBI-9997373";
 
+
 //This is syntactic sugar and is used across all the svg element files as a common util.
 var setAttr = function (elem, x, y) {
-    elem.setAttributeNS(null, x, y);
-},
+        elem.setAttributeNS(null, x, y);
+    },
     createElem = function (elemName) {
         return document.createElementNS("http://www.w3.org/2000/svg", elemName);
     },
     graphView = new __WEBPACK_IMPORTED_MODULE_0__model_Graph__["a" /* default */](),
     complexViewer = null;
 
-document.addEventListener("DOMContentLoaded", function (event) {
-    //  initViewer("EBI-10828997");
-    //initViewer(currentComplex);
-    //  initViewer("EBI-9008420");
-    //  initViewer("EBI-8869931");
-});
-
 var generateXMLButtons = document.querySelectorAll(".download-sbgn");
 for (var i = 0; i < generateXMLButtons.length; i++) {
     var XMLButton = generateXMLButtons.item(i);
     XMLButton.addEventListener("click", function (event) {
-        generateXML();
+        var complexXML = complexViewer.toXML();
+        Object(__WEBPACK_IMPORTED_MODULE_10__XMLdownloader__["a" /* default */])(complexXML, "xml", currentComplex);
     });
 }
 
 ////// Selector for complexes:
 document.getElementById("complexSelector").addEventListener("change", function (event) {
-    complexViewer.empty();
-    graphView = new __WEBPACK_IMPORTED_MODULE_0__model_Graph__["a" /* default */]();
-    initViewer(event.target.value);
+    var newComplex = event.target.value;
+    route.navigate(event.target.value, {
+        trigger: true
+    });
 });
 
 function initViewer(complexName) {
@@ -144,45 +140,19 @@ function initViewer(complexName) {
         url: "https://www.ebi.ac.uk/intact/complex-ws/export/" + complexName
     }, function (data) {
         var mi = new MIModel(data).load().then(function (model) {
-            try {
-                complexViewer = new __WEBPACK_IMPORTED_MODULE_2__model_ComplexView__["a" /* default */]({
-                    model: model,
-                    el: document.getElementById(svgElementId),
-                    graphView : graphView
-                });
-                new __WEBPACK_IMPORTED_MODULE_8__Title__["a" /* default */]({
-                    model: model,
-                    el: document.getElementById('complextitle')
-                });
-            } catch (e) { console.error(e) }
+            complexViewer = new __WEBPACK_IMPORTED_MODULE_2__model_ComplexView__["a" /* default */]({
+                model: model,
+                el: document.getElementById(svgElementId),
+                graphView: graphView
+            });
+            document.getElementById('complextitle').innerHTML = currentComplex;
         });
     });
 
 };
 
-function generateXML() {
-    var complexXML = complexViewer.toXML();
-    Object(__WEBPACK_IMPORTED_MODULE_11__XMLdownloader__["a" /* default */])(complexXML, "xml", currentComplex);
-}
-
-var AppRouter = Backbone.Router.extend({
-    routes: {
-        "*actions": "defaultRoute"
-    }
-});
-var appRouter = new AppRouter;
-appRouter.on('route:defaultRoute', function (complex) {
-    if(complex) {
-        //navigate to the fragment in the url
-        initViewer(complex);
-    } else {
-        //use a default
-        initViewer(currentComplex);
-    }
-});
-
-Backbone.history.start();
-
+//this makes everything happen
+var route = new __WEBPACK_IMPORTED_MODULE_11__router__["a" /* default */](initViewer);
 
 /***/ }),
 
@@ -381,34 +351,6 @@ var ComplexView = Backbone.View.extend({
 });
 
 /* harmony default export */ __webpack_exports__["a"] = (ComplexView);
-
-/***/ }),
-
-/***/ 188:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = Title;
-function Title() {
-    Backbone.View.extend({
-    initialize: function() {
-        this.render();
-        this.listenTo(this.model, "change", this.render);
-    },
-    render: function() {
-        var ids = this.model.get("interactions").models[0].get("identifiers"),
-            title;
-        ids.map(function(id) {
-            //this might be a little fragile. Will they all have Intact IDs? haha.
-            if (id.db === "intact") {
-                title = id.id;
-            }
-        });
-        this.$el.html(title);
-    }
-})
-};
-
 
 /***/ }),
 
@@ -625,6 +567,48 @@ function Maths(){
     return { boxLineIntersection: boxLineIntersection};
 };
 
+
+/***/ }),
+
+/***/ 497:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = router;
+//routing thanks to https://cdnjs.com/libraries/backbone.js/tutorials/what-is-a-router
+function router(initViewer) {
+    var AppRouter = Backbone.Router.extend({
+    routes: {
+        "*actions": "defaultRoute"
+    }
+    
+});
+
+this.appRouter = new AppRouter;
+
+this.appRouter.on('route:defaultRoute', function (complex) {
+        if (complex) {
+            console.log("navigating", complex);
+            //navigate to the fragment in the url
+            initViewer(complex);
+        } else {
+            //use a default
+            initViewer(currentComplex);
+        }
+    });
+
+
+Backbone.history.start();
+
+return this;
+}
+
+
+
+router.prototype.navigate = function(whereTo) {
+    this.appRouter.navigate(whereTo,{trigger:true});
+    window.location.reload();
+}
 
 /***/ }),
 

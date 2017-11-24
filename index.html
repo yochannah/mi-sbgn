@@ -12,25 +12,31 @@
 
 
     <header>
-        <div>
             <h1>MI-SBGN complex viewer</h1>
             <h2 id="complextitle"></h2>
-        </div>
-        <aside>
-            <label>Select a complex
-          <select id="complexSelector">
+    </header>
+    <main>
+<aside>
+    <label>Select a complex
+        <select id="complexSelector">
             <option>EBI-10828997</option>
             <option>EBI-9997373</option>
             <option>EBI-9008420</option>
             <option>EBI-8869931</option>
-          </select>
-        </label>
-        </aside>
-        <button type="button" class="download-sbgn">Export as SBGN-ML</button>
-    </header>
-    <main>
+        </select>
+    </label>
+    <button type="button" class="download-sbgn">
+<svg id="icon-download" viewBox="0 0 32 32">
+    <title>download</title>
+    <path d="M23 14l-8 8-8-8h5v-12h6v12zM15 22h-15v8h30v-8h-15zM28 26h-4v-2h4v2z"></path>
+</svg>
+        Export as SBGN-ML</button>
+</aside>
+
+    <div class="svgcontainer">
         <svg id="mi-sbgn" xmlns="http://www.w3.org/2000/svg" height="100" width="100">
-    </svg>
+        </svg>
+        </div>
     </main>
     <!--script src="node_modules/webcola/WebCola/cola.js" charset="utf-8"></script>
     <script src="https://d3js.org/d3.v4.js"></script>
@@ -39,7 +45,7 @@
     <script src="node_modules/backbone/backbone-min.js"></script>
     <script src="node_modules/mi-model/dist/mi-model.js"></script>
     <script src="node_modules/jstoxml/dist/jstoxml-min.js"></script> -->
-    <script src="dist/mi-sbgn-dependencies.bundle.js"></script> 
+    <script src="dist/mi-sbgn-dependencies.bundle.js"></script>
     <script src="dist/mi-sbgn-main.bundle.js"></script>
 
 </body>
