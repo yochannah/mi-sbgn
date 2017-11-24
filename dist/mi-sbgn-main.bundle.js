@@ -60,12 +60,12 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 176);
+/******/ 	return __webpack_require__(__webpack_require__.s = 185);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 176:
+/***/ 185:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -74,19 +74,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createElem", function() { return createElem; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "graphView", function() { return graphView; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "complexViewer", function() { return complexViewer; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__model_Graph__ = __webpack_require__(503);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__model_BindingSite__ = __webpack_require__(499);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__model_ComplexView__ = __webpack_require__(504);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__model_Link__ = __webpack_require__(498);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Layout__ = __webpack_require__(492);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__model_Participant__ = __webpack_require__(501);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__model_ParticipantLabel__ = __webpack_require__(502);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__model_StateVariable__ = __webpack_require__(500);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Title__ = __webpack_require__(495);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__Maths__ = __webpack_require__(485);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__model_UnitOfInformation__ = __webpack_require__(497);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__XMLdownloader__ = __webpack_require__(496);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__external_line_segments_intersect_js__ = __webpack_require__(489);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__model_Graph__ = __webpack_require__(186);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__model_BindingSite__ = __webpack_require__(93);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__model_ComplexView__ = __webpack_require__(187);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__model_Link__ = __webpack_require__(92);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Layout__ = __webpack_require__(98);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__model_Participant__ = __webpack_require__(96);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__model_ParticipantLabel__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__model_StateVariable__ = __webpack_require__(94);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Title__ = __webpack_require__(188);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__Maths__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__model_UnitOfInformation__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__XMLdownloader__ = __webpack_require__(189);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__external_line_segments_intersect_js__ = __webpack_require__(95);
 
 
 
@@ -186,12 +186,300 @@ Backbone.history.start();
 
 /***/ }),
 
-/***/ 485:
+/***/ 186:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = Graph;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Link__ = __webpack_require__(92);
+
+
+function Graph() {
+    this.graph = {
+        nodes: [],
+        links: [],
+        linkDeduplicationLookup: {},
+        nodeIndexLookup: {},
+        groups: []
+    };
+    this.addNode = function (node) {
+        // adds a node and stores a reference to each node in a lookup table, since
+        // cola (the layout library)
+        // runs based on index of nodes rather than ids.
+        this.graph.nodeIndexLookup[node.model.cid] = this.graph.nodes.length;
+        this.graph.nodes.push(node);
+        return node;
+    };
+    this.addLinkIndex = function (link1, link2) {
+        if (this.graph.linkDeduplicationLookup[link1]) {
+            this.graph.linkDeduplicationLookup[link1].push(link2);
+        } else {
+            this.graph.linkDeduplicationLookup[link1] = [link2];
+        }
+    }
+    this.addLinkIndexes = function (link1, link2) {
+        this.addLinkIndex(link2, link1);
+        this.addLinkIndex(link1, link2);
+    }
+    this.isDuplicate = function (link1, link2) {
+        var l1isLinkedTol2, l2isLinkedTol1,
+            l1 = this.graph.linkDeduplicationLookup[link1],
+        l2 = this.graph.linkDeduplicationLookup[link2];
+        if (l1) {
+            l1isLinkedTol2 = (l1.indexOf(link2) !== -1);
+        }
+        if (l2) {
+            l2isLinkedTol1 = (l2.indexOf(link1) !== -1);
+        }
+        return l1isLinkedTol2 || l2isLinkedTol1;
+    }
+    this.addLink = function (source, target) {
+        //adds a single link. Please provide the cid of each model as source/target.
+        var sourceindex = this.graph.nodeIndexLookup[source],
+            targetindex = this.graph.nodeIndexLookup[target],
+            duplicatelink = this.isDuplicate(sourceindex, targetindex);
+        if (!duplicatelink) {
+            var link = new __WEBPACK_IMPORTED_MODULE_0__Link__["a" /* default */](source, target, {
+                source: sourceindex,
+                target: targetindex,
+            });
+            this.addLinkIndexes(sourceindex, targetindex);
+
+            this.graph.links.push(link);
+        }
+    };
+    this.updateNodeSizes = function () {
+        this.graph.nodes.map(function (node) {
+            var bb = node.node.getBBox();
+            node.width = bb.width,
+                node.height = bb.height;
+        })
+    }
+
+    this.addGroup = function (group, parentCid) {
+        var g = {
+            leaves: [],
+            padding: 3,
+            margin: 6
+        }
+        parent = this;
+        group.map(function (groupMember) {
+            var identifier = groupMember.cid;
+            g.leaves.push(parent.graph.nodeIndexLookup[identifier]);
+        });
+        this.graph.groups.push(g);
+        return g;
+    };
+    this.addLinks = function () {
+        //Adds all links for nodes. This needs to be run after all nodes have been created.
+        this.graph.nodes.map(function (aNode) {
+            aNode.addLinks();
+        });
+    }
+    this.boundsToSBGNCoords = function (someNodeBounds) {
+        return {
+            y: someNodeBounds.y.toFixed(0), //I don't know why but this is so goshdarned wrong.
+            x: someNodeBounds.x.toFixed(0),
+            w: (someNodeBounds.X - someNodeBounds.x).toFixed(0),
+            h: (someNodeBounds.Y - someNodeBounds.y).toFixed(0)
+        }
+    }
+}
+
+
+
+/***/ }),
+
+/***/ 187:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Participant__ = __webpack_require__(96);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Layout__ = __webpack_require__(98);
+
+
+
+var ComplexView = Backbone.View.extend({
+    className: "sbgnContainer",
+    initialize: function (x) {
+        this.interactors = this.model.attributes.interactors.models;
+        this.participants = [];
+        this.graphView = x.graphView;
+        this.render();
+        this.listenTo(this.model, "change", this.render);
+     },
+
+    empty: function () {
+        this.$el.html("");
+        this.node = null;
+    },
+    render: function () {
+
+        try {
+            //first we create all the elements, but we don't know
+            //their layout.
+            this.instantiateParticipants();
+            this.graphView.addLinks();
+            this.layout = new __WEBPACK_IMPORTED_MODULE_1__Layout__["a" /* default */](this.el, this.graphView);
+
+        } catch (e) {
+            console.error("%cerror--", "background-color:firebrick; color:#eee;font-weight:bold;", e);
+        }
+        return this;
+    },
+    instantiateParticipants: function () {
+        var parent = this;
+        this.model.get("interactions").at(0).get("participants").map(function (participant) {
+            var newParticipant = new __WEBPACK_IMPORTED_MODULE_0__Participant__["a" /* default */](participant, parent.graphView);
+            parent.participants.push(newParticipant);
+        });
+        this.participants.map(function (participant) {
+            participant.addGroup();
+        });
+    },
+    generateParticipantXML: function () {
+        var parent = this,
+        participantXML = [];
+
+        parent.participants.map(function (participant) {
+            participantXML.push(participant.toXML());
+        });
+
+        return participantXML;
+
+    },
+    generateLinkXML: function () {
+        var parent = this,
+        linkXML = [];
+        parent.graphView.graph.links.map(function (link) {
+            linkXML.push(link.toXML());
+        });
+
+        return linkXML;
+
+    },
+    toXML: function () {
+        var participantXML = this.generateParticipantXML(),
+            linkXML = this.generateLinkXML();
+        return jstoxml.toXML({
+            _name: 'sbgn',
+            _content: {
+                _attrs: {
+                    language: "entity relationship"
+                },
+                _content: participantXML.concat(linkXML),
+                _name: "map"
+            },
+            _attrs: {
+                xmlns: 'http://sbgn.org/libsbgn/0.2'
+            }
+        }, {
+            header: true
+        });
+    }
+
+});
+
+/* harmony default export */ __webpack_exports__["a"] = (ComplexView);
+
+/***/ }),
+
+/***/ 188:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = Title;
+function Title() {
+    Backbone.View.extend({
+    initialize: function() {
+        this.render();
+        this.listenTo(this.model, "change", this.render);
+    },
+    render: function() {
+        var ids = this.model.get("interactions").models[0].get("identifiers"),
+            title;
+        ids.map(function(id) {
+            //this might be a little fragile. Will they all have Intact IDs? haha.
+            if (id.db === "intact") {
+                title = id.id;
+            }
+        });
+        this.$el.html(title);
+    }
+})
+};
+
+
+/***/ }),
+
+/***/ 189:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = downloadFile;
+function downloadFile(fileContents, fileFormat, fileName) {
+    // thanks, SO, for always being there for me: 
+    // https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
+    // great answer from https://stackoverflow.com/users/1768690/default
+    let encodingType = "data:text/" + fileFormat + ";charset=utf-8,";
+    var encodedUri = encodeURI(encodingType + fileContents);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", (fileName + ".xml"));
+    document.body.appendChild(link); // Required for FF
+
+    link.click();
+}
+
+/***/ }),
+
+/***/ 47:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = UnitOfInformation;
+function UnitOfInformation(info) {
+    var uoiTypes = {
+        protein: "mt:prot",
+        binding: "ct:bind"
+    }
+    this.info = uoiTypes[info];
+}
+UnitOfInformation.prototype.toXML = function(){
+    var parent = this;
+    return jstoxml.toXML({
+        _name: 'glyph',
+        _attrs: {
+            id: parent.rect.id,
+            class: "unit of information"
+        },
+        _content: [{
+            _name: "label",
+            _attrs: {
+                "text": parent.info
+            }
+        },
+        {
+            _name: "bbox",
+            _attrs: {
+                y: (parent.rect.y.baseVal.value - parent.rect.height.baseVal.value),
+                x: parent.rect.x.baseVal.value, 
+                w: parent.rect.width.baseVal.value,
+                h: parent.rect.height.baseVal.value}
+        }
+        ]
+    });
+}
+
+
+/***/ }),
+
+/***/ 48:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = Maths;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__external_line_segments_intersect_js__ = __webpack_require__(489);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__external_line_segments_intersect_js__ = __webpack_require__(95);
 
 
 //I wanted to call this file math, but that's already a thing in JS.
@@ -340,7 +628,199 @@ function Maths(){
 
 /***/ }),
 
-/***/ 489:
+/***/ 92:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = Link;
+//It's dangeous to go alone! Take this! <=========(--o
+//I may have spent far too long getting Link's sword just right.
+function Link(source, target, indexes) {
+  // d3 references the links by the index of the object it's linking to
+  // hence why we store references both to the objets themselves 
+  // and also and the indexes in the graph object.
+  this.source = indexes.source;
+  this.target = indexes.target;
+  this.sourceObject = source;
+  this.targetObject = target;
+  this.id = source + "-" + target;
+  this.coords = {};
+  return this;
+}
+
+Link.prototype.toXML = function () {
+  var parent = this;
+  return jstoxml.toXML({
+    _name: 'arc',
+    _attrs: {
+      id : parent.id,
+      class: "interaction",
+      source: parent.sourceObject,
+      target: parent.targetObject,
+    },
+     _content: [
+       {
+         _name: "start",
+         _attrs: {
+           "y": parent.coords.y1,
+           "x": parent.coords.x1
+         }
+       },
+       {
+         _name: "end",
+         _attrs: {
+           "y": parent.coords.y2,
+           "x": parent.coords.x2
+         }
+       }
+    ]
+    // {
+    //   _name: "bbox",
+    //   _attrs: graphView.boundsToSBGNCoords(parent.bounds)
+    // },
+    // parent.uoi.toXML(),
+    // parent.position.toXML(parent.bounds.y)
+    // ]
+
+  });
+
+}
+
+Link.prototype.equals = function(link) {
+  return (((this.link.target === link.link.target) && (this.link.source === link.link.source)) || ((this.link.target === link.link.source) && (this.link.source === link.link.target)))
+}
+
+
+/***/ }),
+
+/***/ 93:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = BindingSite;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__UnitOfInformation__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__StateVariable__ = __webpack_require__(94);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Maths__ = __webpack_require__(48);
+
+
+
+
+function BindingSite(model, graphView) {
+  this.model = model;
+  this.name = "binding region";
+  this.cid = this.model.cid;
+  this.graphView = graphView;
+
+  this.graphView.addNode(this);
+
+  this.uoi = new __WEBPACK_IMPORTED_MODULE_0__UnitOfInformation__["a" /* default */]("binding");
+  this.position = new __WEBPACK_IMPORTED_MODULE_1__StateVariable__["a" /* default */](model.get("pos"));
+  return this;
+}
+
+BindingSite.prototype.getCenterX = function () {
+  var bb = this.node.getBBox();
+  return bb.x + bb.width / 2;
+}
+
+BindingSite.prototype.getCenterY = function () {
+  var bb = this.node.getBBox();
+  return bb.y + bb.height / 2;
+}
+
+BindingSite.prototype.getArrowTarget = function (line, previousLine, prevlinecoord) {
+  return Object(__WEBPACK_IMPORTED_MODULE_2__Maths__["a" /* default */])().boxLineIntersection(this, line, previousLine, prevlinecoord);
+}
+
+BindingSite.prototype.addLinks = function () {
+  //find links and add them.
+  var links = this.model.get("feature").get("linkedFeatures"),
+    parent = this;
+  links.models.map(function (linkedFeature) {
+    var bindingRegions = linkedFeature.get("sequenceData");
+    if (bindingRegions) {
+      bindingRegions.map(function (region) {
+        parent.graphView.addLink(parent.model.cid, region.cid);
+      });
+    } else {
+      console.error("%c something went wrong with the link for", "color:orange;", this);
+    }
+  });
+}
+
+BindingSite.prototype.toXML = function () {
+  var parent = this;
+  return jstoxml.toXML({
+    _name: 'glyph',
+    _attrs: {
+      id: parent.model.cid,
+      class: "entity"
+    },
+    _content: [{
+        _name: "label",
+        _attrs: {
+          "text": "binding region"
+        }
+      },
+      {
+        _name: "bbox",
+        _attrs: parent.graphView.boundsToSBGNCoords(parent.bounds)
+      },
+      parent.uoi.toXML(),
+      parent.position.toXML(parent.bounds.y)
+    ]
+
+  });
+}
+
+/***/ }),
+
+/***/ 94:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = StateVariable;
+
+function StateVariable(info) {
+    this.info = info;
+}
+
+StateVariable.prototype.toXML = function(parentTop){
+    var parent = this;
+    return jstoxml.toXML({
+        _name: 'glyph',
+        _attrs: {
+            id: parent.rect.id,
+            class: "state variable"
+        },
+        _content: [{
+            _name: "state",
+            _attrs: {
+                "value": parent.info
+            }
+        },
+        {
+            _name: "bbox",
+            _attrs: {
+                //using the parent.rect.y throws this massively off in Vanted viewer. 
+                //Not sure if it's the fault of this code or vanted, but using
+                //the parent element's y coord seems to fix it.
+                y: parentTop,
+                x: parent.rect.x.baseVal.value.toFixed(0),
+                w: parent.rect.width.baseVal.value.toFixed(0),
+                h: parent.rect.height.baseVal.value.toFixed(0)
+            }
+        }
+        ]
+
+    });;
+
+}
+
+
+/***/ }),
+
+/***/ 95:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -465,12 +945,168 @@ function allEqual(args) {
 
 /***/ }),
 
-/***/ 492:
+/***/ 96:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = Participant;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ParticipantLabel__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UnitOfInformation__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BindingSite__ = __webpack_require__(93);
+
+
+
+
+function Participant(model, graphView) {
+    this.graphView = graphView;
+    this.init(model); 
+    return this;
+}
+
+Participant.prototype.addGroup = function () {
+    var groupMembers = this.bindingSites.concat(this.label);
+    this.group = this.graphView.addGroup(groupMembers, this.model.cid);
+}
+
+Participant.prototype.getBounds = function () {
+    return this.graphView.boundsToSBGNCoords(this.group.bounds);
+}
+
+Participant.prototype.generateBindingSiteXML = function () {
+    var sites = [];
+
+    this.node.bindingSites.map(function (bindingSite) {
+        sites.push(bindingSite.toXML());
+    });
+    return sites;
+}
+
+Participant.prototype.toXML = function () {
+    var parent = this,
+        //build array of xml tags up
+        bindingSiteXML = parent.generateBindingSiteXML(),
+        participantXML = [{
+                _name: "label",
+                //**This is what I WISH I could do: specify label location. but apparently that's invalid sbgn-ml.  
+                // _attrs: $.fn.extend({
+                //     "text": parent.label.name
+                // },graphView.boundsToSBGNCoords(parent.label.bounds))
+                _attrs: {
+                    "text": parent.label.name
+                },
+            },
+            {
+                _name: "bbox",
+                _attrs: parent.getBounds()
+            }
+        ];
+    // combine xml and send it to parent function
+    return jstoxml.toXML({
+        _name: 'glyph',
+        _attrs: {
+            id: parent.model.cid,
+            class: "entity"
+        },
+        _content: participantXML.concat(bindingSiteXML)
+
+    });
+}
+
+Participant.prototype.init = function (model) {
+    this.model = model;
+    this.node = {};
+    this.interactor = this.model.get("interactor");
+    this.initFeatures();
+    this.initBindingSites();
+
+    this.label = new __WEBPACK_IMPORTED_MODULE_0__ParticipantLabel__["a" /* default */](this.interactor.get("label"), this.interactor.cid);
+    this.graphView.addNode(this.label, this.interactor.cid);
+
+    this.node.uoi = new __WEBPACK_IMPORTED_MODULE_1__UnitOfInformation__["a" /* default */](this.interactor.get("type").name);
+
+    if (this.bindingSites) {
+        var parent = this;
+        parent.node.bindingSites = [];
+        this.bindingSites.map(function (site) {
+            var newSite = new __WEBPACK_IMPORTED_MODULE_2__BindingSite__["a" /* default */](site, parent.graphView);
+            parent.node.bindingSites.push(newSite);
+        });
+    }
+}
+
+Participant.prototype.initFeatures = function () {
+    this.features = this.model.get("features");
+    if (this.features.length > 0) {
+        this.features = this.features.models;
+    } else {
+        this.features = false;
+    }
+    if (this.features) {
+        this.links = [];
+        var links = [];
+        this.features.map(function (feature) {
+            var id1 = parseInt(feature.get("linkedFeatures").models[0].get("id"), 10);
+            var id2 = parseInt(feature.get("id"), 10);
+            links = links.concat(feature.get("linkedFeatures").models);
+        });
+    }
+}
+
+Participant.prototype.initBindingSites = function () {
+    var binding = [];
+    if (this.features) {
+        this.features.map(function (feature) {
+            var seq = feature.get("sequenceData").models;
+            if (seq) {
+                binding = binding.concat(seq);
+            } else {
+                console.log("%cfeature", "color:turquoise;font-weight:bold;", feature);
+            }
+        });
+        if (binding.length > 0) {
+            this.bindingSites = binding;
+        }
+    }
+}
+
+/***/ }),
+
+/***/ 97:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* unused harmony export labelcount */
+/* harmony export (immutable) */ __webpack_exports__["a"] = Label;
+var labelcount = 0;
+function Label(textContent, parentId) {
+  labelcount++;
+
+
+  this.model = {cid: parentId + "-label-" + labelcount};
+  this.cid = this.model.cid;
+  this.name = textContent;
+
+  return this;
+}
+
+Label.prototype.addLinks = function(){
+  //not needed for labels. they have no links, kthx. they just float about in
+  //their parents' box. Spongers.
+}
+
+Label.prototype.setLocation = function(x, y){
+  //as above. We don't need to do anything, parent manages it.
+}
+
+
+/***/ }),
+
+/***/ 98:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = Layout;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Maths__ = __webpack_require__(485);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Maths__ = __webpack_require__(48);
 
 
 function Layout(el, graphView) {
@@ -749,642 +1385,6 @@ function updateParent() {
 
 }
 
-
-/***/ }),
-
-/***/ 495:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = Title;
-function Title() {
-    Backbone.View.extend({
-    initialize: function() {
-        this.render();
-        this.listenTo(this.model, "change", this.render);
-    },
-    render: function() {
-        var ids = this.model.get("interactions").models[0].get("identifiers"),
-            title;
-        ids.map(function(id) {
-            //this might be a little fragile. Will they all have Intact IDs? haha.
-            if (id.db === "intact") {
-                title = id.id;
-            }
-        });
-        this.$el.html(title);
-    }
-})
-};
-
-
-/***/ }),
-
-/***/ 496:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = downloadFile;
-function downloadFile(fileContents, fileFormat, fileName) {
-    // thanks, SO, for always being there for me: 
-    // https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
-    // great answer from https://stackoverflow.com/users/1768690/default
-    let encodingType = "data:text/" + fileFormat + ";charset=utf-8,";
-    var encodedUri = encodeURI(encodingType + fileContents);
-    var link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", (fileName + ".xml"));
-    document.body.appendChild(link); // Required for FF
-
-    link.click();
-}
-
-/***/ }),
-
-/***/ 497:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = UnitOfInformation;
-function UnitOfInformation(info) {
-    var uoiTypes = {
-        protein: "mt:prot",
-        binding: "ct:bind"
-    }
-    this.info = uoiTypes[info];
-}
-UnitOfInformation.prototype.toXML = function(){
-    var parent = this;
-    return jstoxml.toXML({
-        _name: 'glyph',
-        _attrs: {
-            id: parent.rect.id,
-            class: "unit of information"
-        },
-        _content: [{
-            _name: "label",
-            _attrs: {
-                "text": parent.info
-            }
-        },
-        {
-            _name: "bbox",
-            _attrs: {
-                y: (parent.rect.y.baseVal.value - parent.rect.height.baseVal.value),
-                x: parent.rect.x.baseVal.value, 
-                w: parent.rect.width.baseVal.value,
-                h: parent.rect.height.baseVal.value}
-        }
-        ]
-    });
-}
-
-
-/***/ }),
-
-/***/ 498:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = Link;
-//It's dangeous to go alone! Take this! <=========(--o
-//I may have spent far too long getting Link's sword just right.
-function Link(source, target, indexes) {
-  // d3 references the links by the index of the object it's linking to
-  // hence why we store references both to the objets themselves 
-  // and also and the indexes in the graph object.
-  this.source = indexes.source;
-  this.target = indexes.target;
-  this.sourceObject = source;
-  this.targetObject = target;
-  this.id = source + "-" + target;
-  this.coords = {};
-  return this;
-}
-
-Link.prototype.toXML = function () {
-  var parent = this;
-  return jstoxml.toXML({
-    _name: 'arc',
-    _attrs: {
-      id : parent.id,
-      class: "interaction",
-      source: parent.sourceObject,
-      target: parent.targetObject,
-    },
-     _content: [
-       {
-         _name: "start",
-         _attrs: {
-           "y": parent.coords.y1,
-           "x": parent.coords.x1
-         }
-       },
-       {
-         _name: "end",
-         _attrs: {
-           "y": parent.coords.y2,
-           "x": parent.coords.x2
-         }
-       }
-    ]
-    // {
-    //   _name: "bbox",
-    //   _attrs: graphView.boundsToSBGNCoords(parent.bounds)
-    // },
-    // parent.uoi.toXML(),
-    // parent.position.toXML(parent.bounds.y)
-    // ]
-
-  });
-
-}
-
-Link.prototype.equals = function(link) {
-  return (((this.link.target === link.link.target) && (this.link.source === link.link.source)) || ((this.link.target === link.link.source) && (this.link.source === link.link.target)))
-}
-
-
-/***/ }),
-
-/***/ 499:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = BindingSite;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__UnitOfInformation__ = __webpack_require__(497);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__StateVariable__ = __webpack_require__(500);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Maths__ = __webpack_require__(485);
-
-
-
-
-function BindingSite(model, graphView) {
-  this.model = model;
-  this.name = "binding region";
-  this.cid = this.model.cid;
-  this.graphView = graphView;
-
-  this.graphView.addNode(this);
-
-  this.uoi = new __WEBPACK_IMPORTED_MODULE_0__UnitOfInformation__["a" /* default */]("binding");
-  this.position = new __WEBPACK_IMPORTED_MODULE_1__StateVariable__["a" /* default */](model.get("pos"));
-  return this;
-}
-
-BindingSite.prototype.getCenterX = function () {
-  var bb = this.node.getBBox();
-  return bb.x + bb.width / 2;
-}
-
-BindingSite.prototype.getCenterY = function () {
-  var bb = this.node.getBBox();
-  return bb.y + bb.height / 2;
-}
-
-BindingSite.prototype.getArrowTarget = function (line, previousLine, prevlinecoord) {
-  return Object(__WEBPACK_IMPORTED_MODULE_2__Maths__["a" /* default */])().boxLineIntersection(this, line, previousLine, prevlinecoord);
-}
-
-BindingSite.prototype.addLinks = function () {
-  //find links and add them.
-  var links = this.model.get("feature").get("linkedFeatures"),
-    parent = this;
-  links.models.map(function (linkedFeature) {
-    var bindingRegions = linkedFeature.get("sequenceData");
-    if (bindingRegions) {
-      bindingRegions.map(function (region) {
-        parent.graphView.addLink(parent.model.cid, region.cid);
-      });
-    } else {
-      console.error("%c something went wrong with the link for", "color:orange;", this);
-    }
-  });
-}
-
-BindingSite.prototype.toXML = function () {
-  var parent = this;
-  return jstoxml.toXML({
-    _name: 'glyph',
-    _attrs: {
-      id: parent.model.cid,
-      class: "entity"
-    },
-    _content: [{
-        _name: "label",
-        _attrs: {
-          "text": "binding region"
-        }
-      },
-      {
-        _name: "bbox",
-        _attrs: parent.graphView.boundsToSBGNCoords(parent.bounds)
-      },
-      parent.uoi.toXML(),
-      parent.position.toXML(parent.bounds.y)
-    ]
-
-  });
-}
-
-/***/ }),
-
-/***/ 500:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = StateVariable;
-
-function StateVariable(info) {
-    this.info = info;
-}
-
-StateVariable.prototype.toXML = function(parentTop){
-    var parent = this;
-    return jstoxml.toXML({
-        _name: 'glyph',
-        _attrs: {
-            id: parent.rect.id,
-            class: "state variable"
-        },
-        _content: [{
-            _name: "state",
-            _attrs: {
-                "value": parent.info
-            }
-        },
-        {
-            _name: "bbox",
-            _attrs: {
-                //using the parent.rect.y throws this massively off in Vanted viewer. 
-                //Not sure if it's the fault of this code or vanted, but using
-                //the parent element's y coord seems to fix it.
-                y: parentTop,
-                x: parent.rect.x.baseVal.value.toFixed(0),
-                w: parent.rect.width.baseVal.value.toFixed(0),
-                h: parent.rect.height.baseVal.value.toFixed(0)
-            }
-        }
-        ]
-
-    });;
-
-}
-
-
-/***/ }),
-
-/***/ 501:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = Participant;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ParticipantLabel__ = __webpack_require__(502);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UnitOfInformation__ = __webpack_require__(497);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BindingSite__ = __webpack_require__(499);
-
-
-
-
-function Participant(model, graphView) {
-    this.graphView = graphView;
-    this.init(model); 
-    return this;
-}
-
-Participant.prototype.addGroup = function () {
-    var groupMembers = this.bindingSites.concat(this.label);
-    this.group = this.graphView.addGroup(groupMembers, this.model.cid);
-}
-
-Participant.prototype.getBounds = function () {
-    return this.graphView.boundsToSBGNCoords(this.group.bounds);
-}
-
-Participant.prototype.generateBindingSiteXML = function () {
-    var sites = [];
-
-    this.node.bindingSites.map(function (bindingSite) {
-        sites.push(bindingSite.toXML());
-    });
-    return sites;
-}
-
-Participant.prototype.toXML = function () {
-    var parent = this,
-        //build array of xml tags up
-        bindingSiteXML = parent.generateBindingSiteXML(),
-        participantXML = [{
-                _name: "label",
-                //**This is what I WISH I could do: specify label location. but apparently that's invalid sbgn-ml.  
-                // _attrs: $.fn.extend({
-                //     "text": parent.label.name
-                // },graphView.boundsToSBGNCoords(parent.label.bounds))
-                _attrs: {
-                    "text": parent.label.name
-                },
-            },
-            {
-                _name: "bbox",
-                _attrs: parent.getBounds()
-            }
-        ];
-    // combine xml and send it to parent function
-    return jstoxml.toXML({
-        _name: 'glyph',
-        _attrs: {
-            id: parent.model.cid,
-            class: "entity"
-        },
-        _content: participantXML.concat(bindingSiteXML)
-
-    });
-}
-
-Participant.prototype.init = function (model) {
-    this.model = model;
-    this.node = {};
-    this.interactor = this.model.get("interactor");
-    this.initFeatures();
-    this.initBindingSites();
-
-    this.label = new __WEBPACK_IMPORTED_MODULE_0__ParticipantLabel__["a" /* default */](this.interactor.get("label"), this.interactor.cid);
-    this.graphView.addNode(this.label, this.interactor.cid);
-
-    this.node.uoi = new __WEBPACK_IMPORTED_MODULE_1__UnitOfInformation__["a" /* default */](this.interactor.get("type").name);
-
-    if (this.bindingSites) {
-        var parent = this;
-        parent.node.bindingSites = [];
-        this.bindingSites.map(function (site) {
-            var newSite = new __WEBPACK_IMPORTED_MODULE_2__BindingSite__["a" /* default */](site, parent.graphView);
-            parent.node.bindingSites.push(newSite);
-        });
-    }
-}
-
-Participant.prototype.initFeatures = function () {
-    this.features = this.model.get("features");
-    if (this.features.length > 0) {
-        this.features = this.features.models;
-    } else {
-        this.features = false;
-    }
-    if (this.features) {
-        this.links = [];
-        var links = [];
-        this.features.map(function (feature) {
-            var id1 = parseInt(feature.get("linkedFeatures").models[0].get("id"), 10);
-            var id2 = parseInt(feature.get("id"), 10);
-            links = links.concat(feature.get("linkedFeatures").models);
-        });
-    }
-}
-
-Participant.prototype.initBindingSites = function () {
-    var binding = [];
-    if (this.features) {
-        this.features.map(function (feature) {
-            var seq = feature.get("sequenceData").models;
-            if (seq) {
-                binding = binding.concat(seq);
-            } else {
-                console.log("%cfeature", "color:turquoise;font-weight:bold;", feature);
-            }
-        });
-        if (binding.length > 0) {
-            this.bindingSites = binding;
-        }
-    }
-}
-
-/***/ }),
-
-/***/ 502:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* unused harmony export labelcount */
-/* harmony export (immutable) */ __webpack_exports__["a"] = Label;
-var labelcount = 0;
-function Label(textContent, parentId) {
-  labelcount++;
-
-
-  this.model = {cid: parentId + "-label-" + labelcount};
-  this.cid = this.model.cid;
-  this.name = textContent;
-
-  return this;
-}
-
-Label.prototype.addLinks = function(){
-  //not needed for labels. they have no links, kthx. they just float about in
-  //their parents' box. Spongers.
-}
-
-Label.prototype.setLocation = function(x, y){
-  //as above. We don't need to do anything, parent manages it.
-}
-
-
-/***/ }),
-
-/***/ 503:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = Graph;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Link__ = __webpack_require__(498);
-
-
-function Graph() {
-    this.graph = {
-        nodes: [],
-        links: [],
-        linkDeduplicationLookup: {},
-        nodeIndexLookup: {},
-        groups: []
-    };
-    this.addNode = function (node) {
-        // adds a node and stores a reference to each node in a lookup table, since
-        // cola (the layout library)
-        // runs based on index of nodes rather than ids.
-        this.graph.nodeIndexLookup[node.model.cid] = this.graph.nodes.length;
-        this.graph.nodes.push(node);
-        return node;
-    };
-    this.addLinkIndex = function (link1, link2) {
-        if (this.graph.linkDeduplicationLookup[link1]) {
-            this.graph.linkDeduplicationLookup[link1].push(link2);
-        } else {
-            this.graph.linkDeduplicationLookup[link1] = [link2];
-        }
-    }
-    this.addLinkIndexes = function (link1, link2) {
-        this.addLinkIndex(link2, link1);
-        this.addLinkIndex(link1, link2);
-    }
-    this.isDuplicate = function (link1, link2) {
-        var l1isLinkedTol2, l2isLinkedTol1,
-            l1 = this.graph.linkDeduplicationLookup[link1],
-        l2 = this.graph.linkDeduplicationLookup[link2];
-        if (l1) {
-            l1isLinkedTol2 = (l1.indexOf(link2) !== -1);
-        }
-        if (l2) {
-            l2isLinkedTol1 = (l2.indexOf(link1) !== -1);
-        }
-        return l1isLinkedTol2 || l2isLinkedTol1;
-    }
-    this.addLink = function (source, target) {
-        //adds a single link. Please provide the cid of each model as source/target.
-        var sourceindex = this.graph.nodeIndexLookup[source],
-            targetindex = this.graph.nodeIndexLookup[target],
-            duplicatelink = this.isDuplicate(sourceindex, targetindex);
-        if (!duplicatelink) {
-            var link = new __WEBPACK_IMPORTED_MODULE_0__Link__["a" /* default */](source, target, {
-                source: sourceindex,
-                target: targetindex,
-            });
-            this.addLinkIndexes(sourceindex, targetindex);
-
-            this.graph.links.push(link);
-        }
-    };
-    this.updateNodeSizes = function () {
-        this.graph.nodes.map(function (node) {
-            var bb = node.node.getBBox();
-            node.width = bb.width,
-                node.height = bb.height;
-        })
-    }
-
-    this.addGroup = function (group, parentCid) {
-        var g = {
-            leaves: [],
-            padding: 3,
-            margin: 6
-        }
-        parent = this;
-        group.map(function (groupMember) {
-            var identifier = groupMember.cid;
-            g.leaves.push(parent.graph.nodeIndexLookup[identifier]);
-        });
-        this.graph.groups.push(g);
-        return g;
-    };
-    this.addLinks = function () {
-        //Adds all links for nodes. This needs to be run after all nodes have been created.
-        this.graph.nodes.map(function (aNode) {
-            aNode.addLinks();
-        });
-    }
-    this.boundsToSBGNCoords = function (someNodeBounds) {
-        return {
-            y: someNodeBounds.y.toFixed(0), //I don't know why but this is so goshdarned wrong.
-            x: someNodeBounds.x.toFixed(0),
-            w: (someNodeBounds.X - someNodeBounds.x).toFixed(0),
-            h: (someNodeBounds.Y - someNodeBounds.y).toFixed(0)
-        }
-    }
-}
-
-
-
-/***/ }),
-
-/***/ 504:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Participant__ = __webpack_require__(501);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Layout__ = __webpack_require__(492);
-
-
-
-var ComplexView = Backbone.View.extend({
-    className: "sbgnContainer",
-    initialize: function (x) {
-        this.interactors = this.model.attributes.interactors.models;
-        this.participants = [];
-        this.graphView = x.graphView;
-        this.render();
-        this.listenTo(this.model, "change", this.render);
-     },
-
-    empty: function () {
-        this.$el.html("");
-        this.node = null;
-    },
-    render: function () {
-
-        try {
-            //first we create all the elements, but we don't know
-            //their layout.
-            this.instantiateParticipants();
-            this.graphView.addLinks();
-            this.layout = new __WEBPACK_IMPORTED_MODULE_1__Layout__["a" /* default */](this.el, this.graphView);
-
-        } catch (e) {
-            console.error("%cerror--", "background-color:firebrick; color:#eee;font-weight:bold;", e);
-        }
-        return this;
-    },
-    instantiateParticipants: function () {
-        var parent = this;
-        this.model.get("interactions").at(0).get("participants").map(function (participant) {
-            var newParticipant = new __WEBPACK_IMPORTED_MODULE_0__Participant__["a" /* default */](participant, parent.graphView);
-            parent.participants.push(newParticipant);
-        });
-        this.participants.map(function (participant) {
-            participant.addGroup();
-        });
-    },
-    generateParticipantXML: function () {
-        var parent = this,
-        participantXML = [];
-
-        parent.participants.map(function (participant) {
-            participantXML.push(participant.toXML());
-        });
-
-        return participantXML;
-
-    },
-    generateLinkXML: function () {
-        var parent = this,
-        linkXML = [];
-        parent.graphView.graph.links.map(function (link) {
-            linkXML.push(link.toXML());
-        });
-
-        return linkXML;
-
-    },
-    toXML: function () {
-        var participantXML = this.generateParticipantXML(),
-            linkXML = this.generateLinkXML();
-        return jstoxml.toXML({
-            _name: 'sbgn',
-            _content: {
-                _attrs: {
-                    language: "entity relationship"
-                },
-                _content: participantXML.concat(linkXML),
-                _name: "map"
-            },
-            _attrs: {
-                xmlns: 'http://sbgn.org/libsbgn/0.2'
-            }
-        }, {
-            header: true
-        });
-    }
-
-});
-
-/* harmony default export */ __webpack_exports__["a"] = (ComplexView);
 
 /***/ })
 
