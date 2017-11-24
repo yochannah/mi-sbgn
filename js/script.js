@@ -1,14 +1,14 @@
-import Graph from './Graph';
-import BindingSite from './BindingSite';
-import ComplexView from './ComplexView';
-import Link from './Link';
+import Graph from './model/Graph';
+import BindingSite from './model/BindingSite';
+import ComplexView from './model/ComplexView';
+import Link from './model/Link';
 import Layout from './Layout';
-import Participant from './Participant';
-import './ParticipantLabel';
-import StateVariable from './StateVariable';
+import Participant from './model/Participant';
+import './model/ParticipantLabel';
+import StateVariable from './model/StateVariable';
 import Title from './Title';
 import Maths from './Maths';
-import UnitOfInformation from './UnitOfInformation';
+import UnitOfInformation from './model/UnitOfInformation';
 import downloadFile from './XMLdownloader';
 import doLineSegmentsIntersect from './external/line-segments-intersect.js';
 
@@ -82,7 +82,7 @@ var AppRouter = Backbone.Router.extend({
     }
 });
 var appRouter = new AppRouter;
-app_router.on('route:defaultRoute', function (complex) {
+appRouter.on('route:defaultRoute', function (complex) {
     if(complex) {
         //navigate to the fragment in the url
         initViewer(complex);

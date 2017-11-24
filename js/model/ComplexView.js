@@ -1,5 +1,5 @@
 import Participant from './Participant';
-import Layout from './Layout';
+import Layout from './../Layout';
 
 var ComplexView = Backbone.View.extend({
     className: "sbgnContainer",

@@ -1,6 +1,6 @@
 import UnitOfInformation from './UnitOfInformation';
 import StateVariable from './StateVariable';
-import Maths from './Maths';
+import Maths from './../Maths';
 
 export default function BindingSite(model, graphView) {
   this.model = model;
