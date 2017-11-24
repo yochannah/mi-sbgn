@@ -60,12 +60,12 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 185);
+/******/ 	return __webpack_require__(__webpack_require__.s = 176);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 185:
+/***/ 176:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -74,19 +74,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createElem", function() { return createElem; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "graphView", function() { return graphView; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "complexViewer", function() { return complexViewer; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Graph__ = __webpack_require__(186);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__BindingSite__ = __webpack_require__(93);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ComplexView__ = __webpack_require__(187);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Link__ = __webpack_require__(92);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Layout__ = __webpack_require__(98);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Participant__ = __webpack_require__(96);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ParticipantLabel__ = __webpack_require__(97);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__StateVariable__ = __webpack_require__(94);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Title__ = __webpack_require__(188);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__Maths__ = __webpack_require__(48);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__UnitOfInformation__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__XMLdownloader__ = __webpack_require__(189);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__external_line_segments_intersect_js__ = __webpack_require__(95);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Graph__ = __webpack_require__(493);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__BindingSite__ = __webpack_require__(487);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ComplexView__ = __webpack_require__(494);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Link__ = __webpack_require__(486);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Layout__ = __webpack_require__(492);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Participant__ = __webpack_require__(490);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ParticipantLabel__ = __webpack_require__(491);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__StateVariable__ = __webpack_require__(488);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Title__ = __webpack_require__(495);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__Maths__ = __webpack_require__(485);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__UnitOfInformation__ = __webpack_require__(484);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__XMLdownloader__ = __webpack_require__(496);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__external_line_segments_intersect_js__ = __webpack_require__(489);
 
 
 
@@ -117,7 +117,7 @@ var setAttr = function (elem, x, y) {
 
 document.addEventListener("DOMContentLoaded", function (event) {
     //  initViewer("EBI-10828997");
-    initViewer(currentComplex);
+    //initViewer(currentComplex);
     //  initViewer("EBI-9008420");
     //  initViewer("EBI-8869931");
 });
@@ -165,256 +165,28 @@ function generateXML() {
     Object(__WEBPACK_IMPORTED_MODULE_11__XMLdownloader__["a" /* default */])(complexXML, "xml", currentComplex);
 }
 
-/***/ }),
-
-/***/ 186:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = Graph;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Link__ = __webpack_require__(92);
-
-
-function Graph() {
-    this.graph = {
-        nodes: [],
-        links: [],
-        linkDeduplicationLookup: {},
-        nodeIndexLookup: {},
-        groups: []
-    };
-    this.addNode = function (node) {
-        // adds a node and stores a reference to each node in a lookup table, since
-        // cola (the layout library)
-        // runs based on index of nodes rather than ids.
-        this.graph.nodeIndexLookup[node.model.cid] = this.graph.nodes.length;
-        this.graph.nodes.push(node);
-        return node;
-    };
-    this.addLinkIndex = function (link1, link2) {
-        if (this.graph.linkDeduplicationLookup[link1]) {
-            this.graph.linkDeduplicationLookup[link1].push(link2);
-        } else {
-            this.graph.linkDeduplicationLookup[link1] = [link2];
-        }
+var AppRouter = Backbone.Router.extend({
+    routes: {
+        "*actions": "defaultRoute"
     }
-    this.addLinkIndexes = function (link1, link2) {
-        this.addLinkIndex(link2, link1);
-        this.addLinkIndex(link1, link2);
+});
+var appRouter = new AppRouter;
+app_router.on('route:defaultRoute', function (complex) {
+    if(complex) {
+        //navigate to the fragment in the url
+        initViewer(complex);
+    } else {
+        //use a default
+        initViewer(currentComplex);
     }
-    this.isDuplicate = function (link1, link2) {
-        var l1isLinkedTol2, l2isLinkedTol1,
-            l1 = this.graph.linkDeduplicationLookup[link1],
-        l2 = this.graph.linkDeduplicationLookup[link2];
-        if (l1) {
-            l1isLinkedTol2 = (l1.indexOf(link2) !== -1);
-        }
-        if (l2) {
-            l2isLinkedTol1 = (l2.indexOf(link1) !== -1);
-        }
-        return l1isLinkedTol2 || l2isLinkedTol1;
-    }
-    this.addLink = function (source, target) {
-        //adds a single link. Please provide the cid of each model as source/target.
-        var sourceindex = this.graph.nodeIndexLookup[source],
-            targetindex = this.graph.nodeIndexLookup[target],
-            duplicatelink = this.isDuplicate(sourceindex, targetindex);
-        if (!duplicatelink) {
-            var link = new __WEBPACK_IMPORTED_MODULE_0__Link__["a" /* default */](source, target, {
-                source: sourceindex,
-                target: targetindex,
-            });
-            this.addLinkIndexes(sourceindex, targetindex);
-
-            this.graph.links.push(link);
-        }
-    };
-    this.updateNodeSizes = function () {
-        this.graph.nodes.map(function (node) {
-            var bb = node.node.getBBox();
-            node.width = bb.width,
-                node.height = bb.height;
-        })
-    }
-
-    this.addGroup = function (group, parentCid) {
-        var g = {
-            leaves: [],
-            padding: 3,
-            margin: 6
-        }
-        parent = this;
-        group.map(function (groupMember) {
-            var identifier = groupMember.cid;
-            g.leaves.push(parent.graph.nodeIndexLookup[identifier]);
-        });
-        this.graph.groups.push(g);
-        return g;
-    };
-    this.addLinks = function () {
-        //Adds all links for nodes. This needs to be run after all nodes have been created.
-        this.graph.nodes.map(function (aNode) {
-            aNode.addLinks();
-        });
-    }
-    this.boundsToSBGNCoords = function (someNodeBounds) {
-        return {
-            y: someNodeBounds.y.toFixed(0), //I don't know why but this is so goshdarned wrong.
-            x: someNodeBounds.x.toFixed(0),
-            w: (someNodeBounds.X - someNodeBounds.x).toFixed(0),
-            h: (someNodeBounds.Y - someNodeBounds.y).toFixed(0)
-        }
-    }
-}
-
-
-
-/***/ }),
-
-/***/ 187:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Participant__ = __webpack_require__(96);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Layout__ = __webpack_require__(98);
-
-
-
-var ComplexView = Backbone.View.extend({
-    className: "sbgnContainer",
-    initialize: function (x) {
-        this.interactors = this.model.attributes.interactors.models;
-        this.participants = [];
-        this.graphView = x.graphView;
-        this.render();
-        this.listenTo(this.model, "change", this.render);
-     },
-
-    empty: function () {
-        this.$el.html("");
-        this.node = null;
-    },
-    render: function () {
-
-        try {
-            //first we create all the elements, but we don't know
-            //their layout.
-            this.instantiateParticipants();
-            this.graphView.addLinks();
-            this.layout = new __WEBPACK_IMPORTED_MODULE_1__Layout__["a" /* default */](this.el, this.graphView);
-
-        } catch (e) {
-            console.error("%cerror--", "background-color:firebrick; color:#eee;font-weight:bold;", e);
-        }
-        return this;
-    },
-    instantiateParticipants: function () {
-        var parent = this;
-        this.model.get("interactions").at(0).get("participants").map(function (participant) {
-            var newParticipant = new __WEBPACK_IMPORTED_MODULE_0__Participant__["a" /* default */](participant, parent.graphView);
-            parent.participants.push(newParticipant);
-        });
-        this.participants.map(function (participant) {
-            participant.addGroup();
-        });
-    },
-    generateParticipantXML: function () {
-        var parent = this,
-        participantXML = [];
-
-        parent.participants.map(function (participant) {
-            participantXML.push(participant.toXML());
-        });
-
-        return participantXML;
-
-    },
-    generateLinkXML: function () {
-        var parent = this,
-        linkXML = [];
-        parent.graphView.graph.links.map(function (link) {
-            linkXML.push(link.toXML());
-        });
-
-        return linkXML;
-
-    },
-    toXML: function () {
-        var participantXML = this.generateParticipantXML(),
-            linkXML = this.generateLinkXML();
-        return jstoxml.toXML({
-            _name: 'sbgn',
-            _content: {
-                _attrs: {
-                    language: "entity relationship"
-                },
-                _content: participantXML.concat(linkXML),
-                _name: "map"
-            },
-            _attrs: {
-                xmlns: 'http://sbgn.org/libsbgn/0.2'
-            }
-        }, {
-            header: true
-        });
-    }
-
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (ComplexView);
-
-/***/ }),
-
-/***/ 188:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = Title;
-function Title() {
-    Backbone.View.extend({
-    initialize: function() {
-        this.render();
-        this.listenTo(this.model, "change", this.render);
-    },
-    render: function() {
-        var ids = this.model.get("interactions").models[0].get("identifiers"),
-            title;
-        ids.map(function(id) {
-            //this might be a little fragile. Will they all have Intact IDs? haha.
-            if (id.db === "intact") {
-                title = id.id;
-            }
-        });
-        this.$el.html(title);
-    }
-})
-};
+Backbone.history.start();
 
 
 /***/ }),
 
-/***/ 189:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = downloadFile;
-function downloadFile(fileContents, fileFormat, fileName) {
-    // thanks, SO, for always being there for me: 
-    // https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
-    // great answer from https://stackoverflow.com/users/1768690/default
-    let encodingType = "data:text/" + fileFormat + ";charset=utf-8,";
-    var encodedUri = encodeURI(encodingType + fileContents);
-    var link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", (fileName + ".xml"));
-    document.body.appendChild(link); // Required for FF
-
-    link.click();
-}
-
-/***/ }),
-
-/***/ 47:
+/***/ 484:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -455,12 +227,12 @@ UnitOfInformation.prototype.toXML = function(){
 
 /***/ }),
 
-/***/ 48:
+/***/ 485:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = Maths;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__external_line_segments_intersect_js__ = __webpack_require__(95);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__external_line_segments_intersect_js__ = __webpack_require__(489);
 
 
 //I wanted to call this file math, but that's already a thing in JS.
@@ -609,7 +381,7 @@ function Maths(){
 
 /***/ }),
 
-/***/ 92:
+/***/ 486:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -674,14 +446,14 @@ Link.prototype.equals = function(link) {
 
 /***/ }),
 
-/***/ 93:
+/***/ 487:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = BindingSite;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__UnitOfInformation__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__StateVariable__ = __webpack_require__(94);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Maths__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__UnitOfInformation__ = __webpack_require__(484);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__StateVariable__ = __webpack_require__(488);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Maths__ = __webpack_require__(485);
 
 
 
@@ -756,7 +528,7 @@ BindingSite.prototype.toXML = function () {
 
 /***/ }),
 
-/***/ 94:
+/***/ 488:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -801,7 +573,7 @@ StateVariable.prototype.toXML = function(parentTop){
 
 /***/ }),
 
-/***/ 95:
+/***/ 489:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -926,14 +698,14 @@ function allEqual(args) {
 
 /***/ }),
 
-/***/ 96:
+/***/ 490:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = Participant;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ParticipantLabel__ = __webpack_require__(97);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UnitOfInformation__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BindingSite__ = __webpack_require__(93);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ParticipantLabel__ = __webpack_require__(491);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UnitOfInformation__ = __webpack_require__(484);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__BindingSite__ = __webpack_require__(487);
 
 
 
@@ -1052,7 +824,7 @@ Participant.prototype.initBindingSites = function () {
 
 /***/ }),
 
-/***/ 97:
+/***/ 491:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1082,12 +854,12 @@ Label.prototype.setLocation = function(x, y){
 
 /***/ }),
 
-/***/ 98:
+/***/ 492:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = Layout;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Maths__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Maths__ = __webpack_require__(485);
 
 
 function Layout(el, graphView) {
@@ -1366,6 +1138,253 @@ function updateParent() {
 
 }
 
+
+/***/ }),
+
+/***/ 493:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = Graph;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Link__ = __webpack_require__(486);
+
+
+function Graph() {
+    this.graph = {
+        nodes: [],
+        links: [],
+        linkDeduplicationLookup: {},
+        nodeIndexLookup: {},
+        groups: []
+    };
+    this.addNode = function (node) {
+        // adds a node and stores a reference to each node in a lookup table, since
+        // cola (the layout library)
+        // runs based on index of nodes rather than ids.
+        this.graph.nodeIndexLookup[node.model.cid] = this.graph.nodes.length;
+        this.graph.nodes.push(node);
+        return node;
+    };
+    this.addLinkIndex = function (link1, link2) {
+        if (this.graph.linkDeduplicationLookup[link1]) {
+            this.graph.linkDeduplicationLookup[link1].push(link2);
+        } else {
+            this.graph.linkDeduplicationLookup[link1] = [link2];
+        }
+    }
+    this.addLinkIndexes = function (link1, link2) {
+        this.addLinkIndex(link2, link1);
+        this.addLinkIndex(link1, link2);
+    }
+    this.isDuplicate = function (link1, link2) {
+        var l1isLinkedTol2, l2isLinkedTol1,
+            l1 = this.graph.linkDeduplicationLookup[link1],
+        l2 = this.graph.linkDeduplicationLookup[link2];
+        if (l1) {
+            l1isLinkedTol2 = (l1.indexOf(link2) !== -1);
+        }
+        if (l2) {
+            l2isLinkedTol1 = (l2.indexOf(link1) !== -1);
+        }
+        return l1isLinkedTol2 || l2isLinkedTol1;
+    }
+    this.addLink = function (source, target) {
+        //adds a single link. Please provide the cid of each model as source/target.
+        var sourceindex = this.graph.nodeIndexLookup[source],
+            targetindex = this.graph.nodeIndexLookup[target],
+            duplicatelink = this.isDuplicate(sourceindex, targetindex);
+        if (!duplicatelink) {
+            var link = new __WEBPACK_IMPORTED_MODULE_0__Link__["a" /* default */](source, target, {
+                source: sourceindex,
+                target: targetindex,
+            });
+            this.addLinkIndexes(sourceindex, targetindex);
+
+            this.graph.links.push(link);
+        }
+    };
+    this.updateNodeSizes = function () {
+        this.graph.nodes.map(function (node) {
+            var bb = node.node.getBBox();
+            node.width = bb.width,
+                node.height = bb.height;
+        })
+    }
+
+    this.addGroup = function (group, parentCid) {
+        var g = {
+            leaves: [],
+            padding: 3,
+            margin: 6
+        }
+        parent = this;
+        group.map(function (groupMember) {
+            var identifier = groupMember.cid;
+            g.leaves.push(parent.graph.nodeIndexLookup[identifier]);
+        });
+        this.graph.groups.push(g);
+        return g;
+    };
+    this.addLinks = function () {
+        //Adds all links for nodes. This needs to be run after all nodes have been created.
+        this.graph.nodes.map(function (aNode) {
+            aNode.addLinks();
+        });
+    }
+    this.boundsToSBGNCoords = function (someNodeBounds) {
+        return {
+            y: someNodeBounds.y.toFixed(0), //I don't know why but this is so goshdarned wrong.
+            x: someNodeBounds.x.toFixed(0),
+            w: (someNodeBounds.X - someNodeBounds.x).toFixed(0),
+            h: (someNodeBounds.Y - someNodeBounds.y).toFixed(0)
+        }
+    }
+}
+
+
+
+/***/ }),
+
+/***/ 494:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Participant__ = __webpack_require__(490);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Layout__ = __webpack_require__(492);
+
+
+
+var ComplexView = Backbone.View.extend({
+    className: "sbgnContainer",
+    initialize: function (x) {
+        this.interactors = this.model.attributes.interactors.models;
+        this.participants = [];
+        this.graphView = x.graphView;
+        this.render();
+        this.listenTo(this.model, "change", this.render);
+     },
+
+    empty: function () {
+        this.$el.html("");
+        this.node = null;
+    },
+    render: function () {
+
+        try {
+            //first we create all the elements, but we don't know
+            //their layout.
+            this.instantiateParticipants();
+            this.graphView.addLinks();
+            this.layout = new __WEBPACK_IMPORTED_MODULE_1__Layout__["a" /* default */](this.el, this.graphView);
+
+        } catch (e) {
+            console.error("%cerror--", "background-color:firebrick; color:#eee;font-weight:bold;", e);
+        }
+        return this;
+    },
+    instantiateParticipants: function () {
+        var parent = this;
+        this.model.get("interactions").at(0).get("participants").map(function (participant) {
+            var newParticipant = new __WEBPACK_IMPORTED_MODULE_0__Participant__["a" /* default */](participant, parent.graphView);
+            parent.participants.push(newParticipant);
+        });
+        this.participants.map(function (participant) {
+            participant.addGroup();
+        });
+    },
+    generateParticipantXML: function () {
+        var parent = this,
+        participantXML = [];
+
+        parent.participants.map(function (participant) {
+            participantXML.push(participant.toXML());
+        });
+
+        return participantXML;
+
+    },
+    generateLinkXML: function () {
+        var parent = this,
+        linkXML = [];
+        parent.graphView.graph.links.map(function (link) {
+            linkXML.push(link.toXML());
+        });
+
+        return linkXML;
+
+    },
+    toXML: function () {
+        var participantXML = this.generateParticipantXML(),
+            linkXML = this.generateLinkXML();
+        return jstoxml.toXML({
+            _name: 'sbgn',
+            _content: {
+                _attrs: {
+                    language: "entity relationship"
+                },
+                _content: participantXML.concat(linkXML),
+                _name: "map"
+            },
+            _attrs: {
+                xmlns: 'http://sbgn.org/libsbgn/0.2'
+            }
+        }, {
+            header: true
+        });
+    }
+
+});
+
+/* harmony default export */ __webpack_exports__["a"] = (ComplexView);
+
+/***/ }),
+
+/***/ 495:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = Title;
+function Title() {
+    Backbone.View.extend({
+    initialize: function() {
+        this.render();
+        this.listenTo(this.model, "change", this.render);
+    },
+    render: function() {
+        var ids = this.model.get("interactions").models[0].get("identifiers"),
+            title;
+        ids.map(function(id) {
+            //this might be a little fragile. Will they all have Intact IDs? haha.
+            if (id.db === "intact") {
+                title = id.id;
+            }
+        });
+        this.$el.html(title);
+    }
+})
+};
+
+
+/***/ }),
+
+/***/ 496:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = downloadFile;
+function downloadFile(fileContents, fileFormat, fileName) {
+    // thanks, SO, for always being there for me: 
+    // https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
+    // great answer from https://stackoverflow.com/users/1768690/default
+    let encodingType = "data:text/" + fileFormat + ";charset=utf-8,";
+    var encodedUri = encodeURI(encodingType + fileContents);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", (fileName + ".xml"));
+    document.body.appendChild(link); // Required for FF
+
+    link.click();
+}
 
 /***/ })
 

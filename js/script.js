@@ -28,7 +28,7 @@ export var setAttr = function (elem, x, y) {
 
 document.addEventListener("DOMContentLoaded", function (event) {
     //  initViewer("EBI-10828997");
-    initViewer(currentComplex);
+    //initViewer(currentComplex);
     //  initViewer("EBI-9008420");
     //  initViewer("EBI-8869931");
 });
@@ -75,3 +75,21 @@ function generateXML() {
     var complexXML = complexViewer.toXML();
     downloadFile(complexXML, "xml", currentComplex);
 }
+
+var AppRouter = Backbone.Router.extend({
+    routes: {
+        "*actions": "defaultRoute"
+    }
+});
+var appRouter = new AppRouter;
+app_router.on('route:defaultRoute', function (complex) {
+    if(complex) {
+        //navigate to the fragment in the url
+        initViewer(complex);
+    } else {
+        //use a default
+        initViewer(currentComplex);
+    }
+});
+
+Backbone.history.start();
