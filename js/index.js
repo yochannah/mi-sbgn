@@ -45,10 +45,11 @@ document.getElementById("complexSelector").addEventListener("change", function (
 });
 
 function initViewer(complexName) {
-    currentComplex = complexName;
+    if(complexName) {     
+        currentComplex = complexName; }
     $.get({
         dataType: "json",
-        url: "https://www.ebi.ac.uk/intact/complex-ws/export/" + complexName
+        url: "https://www.ebi.ac.uk/intact/complex-ws/export/" + currentComplex
     }, function (data) {
         var mi = new MIModel(data).load().then(function (model) {
             complexViewer = new ComplexView({

@@ -134,10 +134,11 @@ document.getElementById("complexSelector").addEventListener("change", function (
 });
 
 function initViewer(complexName) {
-    currentComplex = complexName;
+    if(complexName) {     
+        currentComplex = complexName; }
     $.get({
         dataType: "json",
-        url: "https://www.ebi.ac.uk/intact/complex-ws/export/" + complexName
+        url: "https://www.ebi.ac.uk/intact/complex-ws/export/" + currentComplex
     }, function (data) {
         var mi = new MIModel(data).load().then(function (model) {
             complexViewer = new __WEBPACK_IMPORTED_MODULE_2__model_ComplexView__["a" /* default */]({
@@ -593,7 +594,7 @@ this.appRouter.on('route:defaultRoute', function (complex) {
             initViewer(complex);
         } else {
             //use a default
-            initViewer(currentComplex);
+            initViewer();
         }
     });
 

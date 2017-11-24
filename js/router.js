@@ -16,7 +16,7 @@ this.appRouter.on('route:defaultRoute', function (complex) {
             initViewer(complex);
         } else {
             //use a default
-            initViewer(currentComplex);
+            initViewer();
         }
     });
 
