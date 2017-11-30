@@ -9,18 +9,17 @@ module.exports = {
   plugins: [
     new UglifyJsPlugin({
       uglifyOptions: {
-        // mangle: {
-        //   reserved: ["$",
-        //     "_",
-        //     "Backbone",
-        //     "MIModel",
-        //     "cola",
-        //     "d3",
-        //     "corner",
-        //     "jstoxml"
-        //   ]
-        // }
-        mangle:false
+        mangle: {
+          reserved: ["$",
+            "_",
+            "Backbone",
+            "MIModel",
+            "cola",
+            "d3",
+            "corner",
+            "jstoxml"
+          ]
+        }
       }
     })
 
