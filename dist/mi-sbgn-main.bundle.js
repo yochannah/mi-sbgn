@@ -127,17 +127,20 @@ for (var i = 0; i < generateXMLButtons.length; i++) {
 
 ////// Selector for complexes:
 try {
-document.getElementById("complexSelector").addEventListener("change", function (event) {
-    var newComplex = event.target.value;
-    route.navigate(event.target.value, {
-        trigger: true
+    document.getElementById("complexSelector").addEventListener("change", function (event) {
+        var newComplex = event.target.value;
+        route.navigate(event.target.value, {
+            trigger: true
+        });
     });
-});
-} catch (e) {console.debug("didn't initialise complex selector")}
+} catch (e) {
+    console.debug("didn't initialise complex selector as the element wan't provided on the page");
+}
 
 function initViewer(complexName) {
-    if(complexName) {     
-        currentComplex = complexName; }
+    if (complexName) {
+        currentComplex = complexName;
+    }
     $.get({
         dataType: "json",
         url: "https://www.ebi.ac.uk/intact/complex-ws/export/" + currentComplex
@@ -154,8 +157,17 @@ function initViewer(complexName) {
 
 };
 
+
 //this makes everything happen
-var route = new __WEBPACK_IMPORTED_MODULE_11__router__["a" /* default */](initViewer);
+if (miSBGNDemo === true) {
+    //if this is the demo page, start routing for the complex switcher
+    var route = new __WEBPACK_IMPORTED_MODULE_11__router__["a" /* default */](initViewer);
+} else {
+    //if it's not the demo page,
+    //expose the init function to the window so it can be initialised externally
+    window.initViewer = initViewer;
+
+}
 
 /***/ }),
 
