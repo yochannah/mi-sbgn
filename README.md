@@ -17,7 +17,7 @@ This should install all relevant dependencies, including the MI-model backbone-b
 
 Assuming you now have a folder in your project root called `mi-sbgn`, add the bundles and css to your page:
 
-```
+```html
     <link rel="stylesheet" href="mi_sbgn/dist/styles.css" type="text/css">
     <script src="mi_sbgn/dist/mi-sbgn-dependencies.bundle.js"></script>
     <script src="mi_sbgn/dist/mi-sbgn-main.bundle.js"></script>
@@ -25,7 +25,7 @@ Assuming you now have a folder in your project root called `mi-sbgn`, add the bu
 ```
 Somewhere in the body of your HTML, add tags that look like this: 
 
-```
+```html
         <div class="svgcontainer">
             <svg id="mi-sbgn" xmlns="http://www.w3.org/2000/svg" height="100" width="100">
             </svg>
@@ -36,7 +36,7 @@ The main.bundle.js file will initialise the component with id `mi-sbgn` automati
 Optionally, add an xml export download button:
 
 
-```
+```html
             <button type="button" class="download-sbgn">
                 <svg id="icon-download" viewBox="0 0 32 32">
                     <title>download</title>
@@ -47,7 +47,7 @@ Optionally, add an xml export download button:
 
 To initialise a specific protein complex, run `initViewer("EBI-SOMECOMPLEXHERE")`, e.g.
 
-```
+```html
     <script>
         initViewer("EBI-10828997");
     </script>
