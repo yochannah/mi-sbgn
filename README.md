@@ -55,4 +55,11 @@ To initialise a specific protein complex, run `initViewer("EBI-SOMECOMPLEXHERE")
 ```
 
 ## building from source
-webpack
+
+We use webpack to build the js into two bundles
+
+To automatically build files while editing them, run this from the mi-sbgn directory root:
+
+```bash
+./node_modules/.bin/webpack --config webpack.config.js --watch
+```
