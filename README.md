@@ -59,9 +59,9 @@ This repository requires [npm](https://docs.npmjs.com/getting-started/installing
 3. `npm install`
 4. `cd node_modules/webcola & npm install - g grunt - cli & npm install & grunt`
 
-Step 4 is required because the npm module from webcola doesn't include a build js version of the script.
-
 This should install all relevant dependencies, including the MI-model backbone-based application which helps us co-ordinate the protein complex data with other elements on the same page.
+
+Step 4 is required because the npm module from webcola doesn't include a built js version of the script.
 
 ### build the scripts
 
