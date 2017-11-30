@@ -126,12 +126,14 @@ for (var i = 0; i < generateXMLButtons.length; i++) {
 }
 
 ////// Selector for complexes:
+try {
 document.getElementById("complexSelector").addEventListener("change", function (event) {
     var newComplex = event.target.value;
     route.navigate(event.target.value, {
         trigger: true
     });
 });
+} catch (e) {console.debug("didn't initialise complex selector")}
 
 function initViewer(complexName) {
     if(complexName) {     
