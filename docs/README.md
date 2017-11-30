@@ -25,7 +25,7 @@ Specification for SBGN Entity Relationship (ER) Version 2 (August 2015): http://
 
 ### Notes about the layout
 
-Given that the layout of SBGN in an automated fashion is considered a hard problem, this viewer allows users to drag and re-arrange automated views until they reach a more pleasing state visul state. Once this is reached they may then download the re-arranged view in a serialised SBGN-ML format, preserving their manual layouts. Skipping the preview/re-arrange step would likely result in messy graphs at this stage, withouht much more complex (and time-intensive) layout algorithms. 
+Given that the layout of SBGN in an automated fashion is considered a hard problem, this viewer allows users to drag and re-arrange automated views until they reach a more pleasing state visul state. Once this is reached they may then download the re-arranged view in a serialised SBGN-ML format, preserving their manual layouts. Skipping the preview/re-arrange step would likely result in messy graphs at this stage, without much more complex (and time-intensive) layout algorithms. 
 
 ## installation
 
