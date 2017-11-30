@@ -3,17 +3,9 @@ SBGN viewer for PSI-MI protein complexes from http://www.ebi.ac.uk/complexportal
 
 [Demo](https://yochannah.github.io/mi-sbgn/)
 
-## Installing
-
-This repository requires [npm](https://docs.npmjs.com/getting-started/installing-node) to manage dependencies. Once npm is installed:
-
-1. Clone this repo
-2. `cd mi-sbgn`
-3. `npm install`
-
-This should install all relevant dependencies, including the MI-model backbone-based application which helps us co-ordinate the protein complex data with other elements on the same page.
-
 ## Initialising the mi-sbgn viewer on an html page
+
+Clone this repo.
 
 Assuming you now have a folder in your project root called `mi-sbgn`, add the bundles and css to your page:
 
@@ -56,6 +48,23 @@ To initialise a specific protein complex, run `initViewer("EBI-SOMECOMPLEXHERE")
 
 ## building from source
 
+### prereqs
+
+This repository requires [npm](https://docs.npmjs.com/getting-started/installing-node) to manage dependencies. Once npm is installed:
+
+### set up dependencies
+
+1. Clone this repo
+2. `cd mi-sbgn`
+3. `npm install`
+4. `cd node_modules/webcola & npm install - g grunt - cli & npm install & grunt`
+
+Step 4 is required because the npm module from webcola doesn't include a build js version of the script.
+
+This should install all relevant dependencies, including the MI-model backbone-based application which helps us co-ordinate the protein complex data with other elements on the same page.
+
+### build the scripts
+
 We use webpack to build the js into two bundles
 
 To automatically build files while editing them, run this from the mi-sbgn directory root:
@@ -63,3 +72,6 @@ To automatically build files while editing them, run this from the mi-sbgn direc
 ```bash
 ./node_modules/.bin/webpack --config webpack.config.js --watch
 ```
+### Other notes
+
+The dependencies specified in js/denendencies.js are all availabloe on the window. If you already have a common dependency such as backbone or jquery on the window, you could remove the dependency from the bundle and re-bundle to save space by removing it from dependencies.js.
