@@ -16,7 +16,7 @@ Assuming you now have a folder in your project root called `mi-sbgn`, add the bu
 ```html
     <link rel="stylesheet" href="node_modules/mi-sbgn/dist/styles.css" type="text/css">
     <script src="node_modules/mi-sbgn/dist/mi-sbgn-dependencies.bundle.js"></script>
-    <script src="node_modules/mi_sbgn/dist/mi-sbgn-main.bundle.js"></script>
+    <script src="node_modules/mi-sbgn/dist/mi-sbgn-main.bundle.js"></script>
 
 ```
 Somewhere in the body of your HTML, add tags that look like this:
