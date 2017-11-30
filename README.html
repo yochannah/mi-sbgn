@@ -10,10 +10,10 @@
 </ol>
 <p>This should install all relevant dependencies, including the MI-model backbone-based application which helps us co-ordinate the protein complex data with other elements on the same page.</p>
 <h2 id="initialising-the-mi-sbgn-viewer-on-an-html-page">Initialising the mi-sbgn viewer on an html page</h2>
-<p>Assuming you&#39;re in the mi-sbgn folder, add the bundles and css to your page:</p>
-<pre><code>    &lt;link rel=&quot;stylesheet&quot; href=&quot;dist/styles.css&quot; type=&quot;text/css&quot;&gt;
-    &lt;script src=&quot;dist/mi-sbgn-dependencies.bundle.js&quot;&gt;&lt;/script&gt;
-    &lt;script src=&quot;dist/mi-sbgn-main.bundle.js&quot;&gt;&lt;/script&gt;
+<p>Assuming you now have a folder in your project root called <code>mi-sbgn</code>, add the bundles and css to your page:</p>
+<pre><code>    &lt;link rel=&quot;stylesheet&quot; href=&quot;mi_sbgn/dist/styles.css&quot; type=&quot;text/css&quot;&gt;
+    &lt;script src=&quot;mi_sbgn/dist/mi-sbgn-dependencies.bundle.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;mi_sbgn/dist/mi-sbgn-main.bundle.js&quot;&gt;&lt;/script&gt;
 </code></pre><p>Somewhere in the body of your HTML, add tags that look like this: </p>
 <pre><code>        &lt;div class=&quot;svgcontainer&quot;&gt;
             &lt;svg id=&quot;mi-sbgn&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; height=&quot;100&quot; width=&quot;100&quot;&gt;
@@ -27,5 +27,9 @@
                     &lt;path d=&quot;M23 14l-8 8-8-8h5v-12h6v12zM15 22h-15v8h30v-8h-15zM28 26h-4v-2h4v2z&quot;&gt;&lt;/path&gt;
                 &lt;/svg&gt;
                 Export as SBGN-ML&lt;/button&gt;
+</code></pre><p>To initialise a specific protein complex, run <code>initViewer(&quot;EBI-SOMECOMPLEXHERE&quot;)</code>, e.g.</p>
+<pre><code>    &lt;script&gt;
+        initViewer(&quot;EBI-10828997&quot;);
+    &lt;/script&gt;
 </code></pre><h2 id="building-from-source">building from source</h2>
 <p>webpack</p>

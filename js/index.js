@@ -48,7 +48,7 @@ try {
     console.debug("didn't initialise complex selector as the element wan't provided on the page");
 }
 
-function initViewer(complexName) {
+export default function initViewer(complexName) {
     if (complexName) {
         currentComplex = complexName;
     }
@@ -68,9 +68,9 @@ function initViewer(complexName) {
 
 };
 
-
+ 
 //this makes everything happen
-if (miSBGNDemo === true) {
+if (window.miSBGNDemo) {
     //if this is the demo page, start routing for the complex switcher
     var route = new router(initViewer);
 } else {

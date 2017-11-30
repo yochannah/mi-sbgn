@@ -25,7 +25,7 @@ var ComplexView = Backbone.View.extend({
             this.layout = new Layout(this.el, this.graphView);
 
         } catch (e) {
-            console.error("%cerror--", "background-color:firebrick; color:#eee;font-weight:bold;", e);
+            console.error("%cerror--\n This is probably a known error with trying to re-initialise mi-model on the same page after it's been initialised once already.\n", "background-color:firebrick; color:#eee;font-weight:bold;", e);
         }
         return this;
     },

@@ -15,12 +15,12 @@ This should install all relevant dependencies, including the MI-model backbone-b
 
 ## Initialising the mi-sbgn viewer on an html page
 
-Assuming you're in the mi-sbgn folder, add the bundles and css to your page:
+Assuming you now have a folder in your project root called `mi-sbgn`, add the bundles and css to your page:
 
 ```
-    <link rel="stylesheet" href="dist/styles.css" type="text/css">
-    <script src="dist/mi-sbgn-dependencies.bundle.js"></script>
-    <script src="dist/mi-sbgn-main.bundle.js"></script>
+    <link rel="stylesheet" href="mi_sbgn/dist/styles.css" type="text/css">
+    <script src="mi_sbgn/dist/mi-sbgn-dependencies.bundle.js"></script>
+    <script src="mi_sbgn/dist/mi-sbgn-main.bundle.js"></script>
 
 ```
 Somewhere in the body of your HTML, add tags that look like this: 
@@ -45,8 +45,14 @@ Optionally, add an xml export download button:
                 Export as SBGN-ML</button>
 ```
 
+To initialise a specific protein complex, run `initViewer("EBI-SOMECOMPLEXHERE")`, e.g.
 
+```
+    <script>
+        initViewer("EBI-10828997");
+    </script>
 
+```
 
 ## building from source
 webpack

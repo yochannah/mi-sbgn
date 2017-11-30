@@ -74,6 +74,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createElem", function() { return createElem; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "graphView", function() { return graphView; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "complexViewer", function() { return complexViewer; });
+/* harmony export (immutable) */ __webpack_exports__["default"] = initViewer;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__model_Graph__ = __webpack_require__(186);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__model_BindingSite__ = __webpack_require__(93);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__model_ComplexView__ = __webpack_require__(187);
@@ -157,9 +158,9 @@ function initViewer(complexName) {
 
 };
 
-
+ 
 //this makes everything happen
-if (miSBGNDemo === true) {
+if (window.miSBGNDemo) {
     //if this is the demo page, start routing for the complex switcher
     var route = new __WEBPACK_IMPORTED_MODULE_11__router__["a" /* default */](initViewer);
 } else {
@@ -308,7 +309,7 @@ var ComplexView = Backbone.View.extend({
             this.layout = new __WEBPACK_IMPORTED_MODULE_1__Layout__["a" /* default */](this.el, this.graphView);
 
         } catch (e) {
-            console.error("%cerror--", "background-color:firebrick; color:#eee;font-weight:bold;", e);
+            console.error("%cerror--\n This is probably a known error with trying to re-initialise mi-model on the same page after it's been initialised once already.\n", "background-color:firebrick; color:#eee;font-weight:bold;", e);
         }
         return this;
     },
