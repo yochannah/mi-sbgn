@@ -84,8 +84,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__model_StateVariable__ = __webpack_require__(94);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Maths__ = __webpack_require__(48);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__model_UnitOfInformation__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__XMLdownloader__ = __webpack_require__(189);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__router__ = __webpack_require__(497);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__XMLdownloader__ = __webpack_require__(188);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__router__ = __webpack_require__(189);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__external_line_segments_intersect_js__ = __webpack_require__(95);
 
 
@@ -355,7 +355,7 @@ var ComplexView = Backbone.View.extend({
 
 /***/ }),
 
-/***/ 189:
+/***/ 188:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -372,6 +372,48 @@ function downloadFile(fileContents, fileFormat, fileName) {
     document.body.appendChild(link); // Required for FF
 
     link.click();
+}
+
+/***/ }),
+
+/***/ 189:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = router;
+//routing thanks to https://cdnjs.com/libraries/backbone.js/tutorials/what-is-a-router
+function router(initViewer) {
+    var AppRouter = Backbone.Router.extend({
+    routes: {
+        "*actions": "defaultRoute"
+    }
+    
+});
+
+this.appRouter = new AppRouter;
+
+this.appRouter.on('route:defaultRoute', function (complex) {
+        if (complex) {
+            console.log("navigating", complex);
+            //navigate to the fragment in the url
+            initViewer(complex);
+        } else {
+            //use a default
+            initViewer();
+        }
+    });
+
+
+Backbone.history.start();
+
+return this;
+}
+
+
+
+router.prototype.navigate = function(whereTo) {
+    this.appRouter.navigate(whereTo,{trigger:true});
+    window.location.reload();
 }
 
 /***/ }),
@@ -568,48 +610,6 @@ function Maths(){
     return { boxLineIntersection: boxLineIntersection};
 };
 
-
-/***/ }),
-
-/***/ 497:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = router;
-//routing thanks to https://cdnjs.com/libraries/backbone.js/tutorials/what-is-a-router
-function router(initViewer) {
-    var AppRouter = Backbone.Router.extend({
-    routes: {
-        "*actions": "defaultRoute"
-    }
-    
-});
-
-this.appRouter = new AppRouter;
-
-this.appRouter.on('route:defaultRoute', function (complex) {
-        if (complex) {
-            console.log("navigating", complex);
-            //navigate to the fragment in the url
-            initViewer(complex);
-        } else {
-            //use a default
-            initViewer();
-        }
-    });
-
-
-Backbone.history.start();
-
-return this;
-}
-
-
-
-router.prototype.navigate = function(whereTo) {
-    this.appRouter.navigate(whereTo,{trigger:true});
-    window.location.reload();
-}
 
 /***/ }),
 
