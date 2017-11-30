@@ -1,28 +1,32 @@
 # mi-sbgn
-SBGN viewer for PSI-MI protein complexes from http://www.ebi.ac.uk/complexportal/home 
+SBGN viewer for PSI-MI protein complexes from http://www.ebi.ac.uk/complexportal/home
 
 [Demo](https://yochannah.github.io/mi-sbgn/)
 
 ## Initialising the mi-sbgn viewer on an html page
 
-Clone this repo.
+This repository requires [npm](https://docs.npmjs.com/getting-started/installing-node) to manage dependencies. Once npm is installed, to install mi-sbgn, run:
+
+```bash
+npm install --save mi-sbgn
+```
 
 Assuming you now have a folder in your project root called `mi-sbgn`, add the bundles and css to your page:
 
 ```html
-    <link rel="stylesheet" href="mi_sbgn/dist/styles.css" type="text/css">
-    <script src="mi_sbgn/dist/mi-sbgn-dependencies.bundle.js"></script>
-    <script src="mi_sbgn/dist/mi-sbgn-main.bundle.js"></script>
+    <link rel="stylesheet" href="node_modules/mi-sbgn/dist/styles.css" type="text/css">
+    <script src="node_modules/mi-sbgn/dist/mi-sbgn-dependencies.bundle.js"></script>
+    <script src="node_modules/mi_sbgn/dist/mi-sbgn-main.bundle.js"></script>
 
 ```
-Somewhere in the body of your HTML, add tags that look like this: 
+Somewhere in the body of your HTML, add tags that look like this:
 
 ```html
         <div class="svgcontainer">
             <svg id="mi-sbgn" xmlns="http://www.w3.org/2000/svg" height="100" width="100">
             </svg>
         </div>
-``` 
+```
 The main.bundle.js file will initialise the component with id `mi-sbgn` automatically
 
 Optionally, add an xml export download button:
